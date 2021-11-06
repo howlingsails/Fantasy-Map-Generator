@@ -2,12 +2,12 @@
 // FMG helper functions
 
 // clip polygon by graph bbox
-function clipPoly(points, secure = 0) {
+export function clipPoly(points, secure = 0) {
   return polygonclip(points, [0, 0, graphWidth, graphHeight], secure);
 }
 
 // get segment of any point on polyline
-function getSegmentId(points, point, step = 10) {
+export function getSegmentId(points, point, step = 10) {
   if (points.length === 2) return 1;
   const d2 = (p1, p2) => (p1[0] - p2[0]) ** 2 + (p1[1] - p2[1]) ** 2;
 
@@ -38,7 +38,7 @@ function getSegmentId(points, point, step = 10) {
 }
 
 // return center point of common edge of 2 pack cells
-function getMiddlePoint(cell1, cell2) {
+export function getMiddlePoint(cell1, cell2) {
   const {cells, vertices} = pack;
 
   const commonVertices = cells.v[cell1].filter(vertex => vertices.c[vertex].some(cell => cell === cell2));
@@ -51,7 +51,7 @@ function getMiddlePoint(cell1, cell2) {
   return [x, y];
 }
 
-function debounce(func, ms) {
+export function debounce(func, ms) {
   let isCooldown = false;
 
   return function () {
@@ -62,7 +62,7 @@ function debounce(func, ms) {
   };
 }
 
-function throttle(func, ms) {
+export function throttle(func, ms) {
   let isThrottled = false;
   let savedArgs;
   let savedThis;
@@ -90,7 +90,7 @@ function throttle(func, ms) {
 }
 
 // parse error to get the readable string in Chrome and Firefox
-function parseError(error) {
+export function parseError(error) {
   const isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > -1;
   const errorString = isFirefox ? error.toString() + " " + error.stack : error.stack;
   const regex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
@@ -99,7 +99,7 @@ function parseError(error) {
   return errorParsed;
 }
 
-function getBase64(url, callback) {
+export function getBase64(url, callback) {
   const xhr = new XMLHttpRequest();
   xhr.onload = function () {
     const reader = new FileReader();
@@ -114,30 +114,30 @@ function getBase64(url, callback) {
 }
 
 // open URL in a new tab or window
-function openURL(url) {
+export function openURL(url) {
   window.open(url, "_blank");
 }
 
 // open project wiki-page
-function wiki(page) {
+export function wiki(page) {
   window.open("https://github.com/Azgaar/Fantasy-Map-Generator/wiki/" + page, "_blank");
 }
 
 // wrap URL into html a element
-function link(URL, description) {
+export function link(URL, description) {
   return `<a href="${URL}" rel="noopener" target="_blank">${description}</a>`;
 }
 
-function isCtrlClick(event) {
+export function isCtrlClick(event) {
   // meta key is cmd key on MacOs
   return event.ctrlKey || event.metaKey;
 }
 
-function generateDate(from = 100, to = 1000) {
+export function generateDate(from = 100, to = 1000) {
   return new Date(rand(from, to), rand(12), rand(31)).toLocaleDateString("en", {year: "numeric", month: "long", day: "numeric"});
 }
 
-function getQGIScoordinates(x, y) {
+export function getQGIScoordinates(x, y) {
   const cx = mapCoordinates.lonW + (x / graphWidth) * mapCoordinates.lonT;
   const cy = mapCoordinates.latN - (y / graphHeight) * mapCoordinates.latT; // this is inverted in QGIS otherwise
   return [cx, cy];

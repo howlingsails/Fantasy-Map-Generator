@@ -1,6 +1,8 @@
 "use strict";
 // Module to store general UI functions
 
+import {debounce} from "./utils/commonUtils";
+
 // fit full-screen map if window is resized
 window.addEventListener("resize", function (e) {
   if (localStorage.getItem("mapWidth") && localStorage.getItem("mapHeight")) return;

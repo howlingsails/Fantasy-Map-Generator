@@ -1,0 +1,12 @@
+{
+  "name": "fantasy-map-generator",
+  "version": "1.7.1",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^2.6.4"
+  }
+}

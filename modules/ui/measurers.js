@@ -1,3 +1,5 @@
+import {last} from "./utils/arrayUtils";
+
 class Rulers {
   constructor() {
     this.data = [];
