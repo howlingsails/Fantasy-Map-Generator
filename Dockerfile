@@ -1,7 +1,14 @@
-FROM nginx:stable-alpine
+FROM python:3
 
-# Copy the contents of the repo to the container
-COPY . /usr/share/nginx/html
+WORKDIR /usr/src/app
 
-# Move the customized nginx config file to the nginx folder
-RUN mv /usr/share/nginx/html/.docker/default.conf /etc/nginx/conf.d/default.conf
+
+COPY . .
+
+
+VOLUME [ "/data" ]
+VOLUME [ "/saves" ]
+
+EXPOSE 9000
+
+CMD ["python","-m","http.server","--bind","::","9000"]
