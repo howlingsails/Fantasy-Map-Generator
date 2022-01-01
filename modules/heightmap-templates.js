@@ -1,5 +1,3 @@
-"use strict";
-
 window.HeightmapTemplates = (function () {
   const volcano = `Hill 1 90-100 44-56 40-60
     Multiply 0.8 50-100 0 0
@@ -119,5 +117,7 @@ window.HeightmapTemplates = (function () {
     Hill 3-4 60-85 20-80 0-5
     Hill 3-4 60-85 20-80 95-100`;
 
-  return {volcano, highIsland, lowIsland, continents, archipelago, atoll, mediterranean, peninsula, peninsula, pangea, isthmus, shattered, taklamakan};
-})();
+  return {
+    volcano, highIsland, lowIsland, continents, archipelago, atoll, mediterranean, peninsula, peninsula, pangea, isthmus, shattered, taklamakan,
+  };
+}());

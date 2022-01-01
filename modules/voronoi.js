@@ -17,20 +17,19 @@ class Voronoi {
     // delaunay.triangles[e] gives the point ID where the half-edge starts
     // delaunay.halfedges[e] returns either the opposite half-edge in the adjacent triangle, or -1 if there's not an adjacent triangle.
     for (let e = 0; e < this.delaunay.triangles.length; e++) {
-
       const p = this.delaunay.triangles[this.nextHalfedge(e)];
       if (p < this.pointsN && !this.cells.c[p]) {
         const edges = this.edgesAroundPoint(e);
-        this.cells.v[p] = edges.map(e => this.triangleOfEdge(e));                                   // cell: adjacent vertex
-        this.cells.c[p] = edges.map(e => this.delaunay.triangles[e]).filter(c => c < this.pointsN); // cell: adjacent valid cells
-        this.cells.b[p] = edges.length > this.cells.c[p].length ? 1 : 0;                            // cell: is border
+        this.cells.v[p] = edges.map((e) => this.triangleOfEdge(e)); // cell: adjacent vertex
+        this.cells.c[p] = edges.map((e) => this.delaunay.triangles[e]).filter((c) => c < this.pointsN); // cell: adjacent valid cells
+        this.cells.b[p] = edges.length > this.cells.c[p].length ? 1 : 0; // cell: is border
       }
 
       const t = this.triangleOfEdge(e);
       if (!this.vertices.p[t]) {
-        this.vertices.p[t] = this.triangleCenter(t);              // vertex: coordinates
+        this.vertices.p[t] = this.triangleCenter(t); // vertex: coordinates
         this.vertices.v[t] = this.trianglesAdjacentToTriangle(t); // vertex: adjacent vertices
-        this.vertices.c[t] = this.pointsOfTriangle(t);            // vertex: adjacent cells
+        this.vertices.c[t] = this.pointsOfTriangle(t); // vertex: adjacent cells
       }
     }
   }
@@ -41,7 +40,7 @@ class Voronoi {
    * @returns {[number, number, number]} The IDs of the points comprising the given triangle.
    */
   pointsOfTriangle(t) {
-    return this.edgesOfTriangle(t).map(edge => this.delaunay.triangles[edge]);
+    return this.edgesOfTriangle(t).map((edge) => this.delaunay.triangles[edge]);
   }
 
   /**
@@ -50,9 +49,9 @@ class Voronoi {
    * @returns {number[]} The indices of the triangles that share half-edges with this triangle.
    */
   trianglesAdjacentToTriangle(t) {
-    let triangles = [];
-    for (let edge of this.edgesOfTriangle(t)) {
-      let opposite = this.delaunay.halfedges[edge];
+    const triangles = [];
+    for (const edge of this.edgesOfTriangle(t)) {
+      const opposite = this.delaunay.halfedges[edge];
       triangles.push(this.triangleOfEdge(opposite));
     }
     return triangles;
@@ -80,7 +79,7 @@ class Voronoi {
    * @returns {[number, number]}
    */
   triangleCenter(t) {
-    let vertices = this.pointsOfTriangle(t).map(p => this.points[p]);
+    const vertices = this.pointsOfTriangle(t).map((p) => this.points[p]);
     return this.circumcenter(vertices[0], vertices[1], vertices[2]);
   }
 
@@ -129,7 +128,7 @@ class Voronoi {
     const D = 2 * (ax * (by - cy) + bx * (cy - ay) + cx * (ay - by));
     return [
       Math.floor(1 / D * (ad * (by - cy) + bd * (cy - ay) + cd * (ay - by))),
-      Math.floor(1 / D * (ad * (cx - bx) + bd * (ax - cx) + cd * (bx - ax)))
+      Math.floor(1 / D * (ad * (cx - bx) + bd * (ax - cx) + cd * (bx - ax))),
     ];
   }
 }
