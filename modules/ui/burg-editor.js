@@ -388,11 +388,13 @@ function editBurg(id) {
     const capital = burgsToRemove.length < burgsInGroup.length;
 
     alertMessage.innerHTML = `Are you sure you want to remove
+<<<<<<<<< Temporary merge branch 1
       ${
         basic || capital
           ? "all unlocked elements in the group"
           : "the entire burg group"
       }?
+
       <br>Please note that capital or locked burgs will not be deleted.
       <br><br>Burgs to be removed: ${burgsToRemove.length}`;
     $("#alert").dialog({
