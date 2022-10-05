@@ -5,5 +5,3 @@ yarn.lock
 .gitignore
 node_modules
 yarn-error.log
-.dnd5e-town-generator
-.Fantasy-Map-Generator

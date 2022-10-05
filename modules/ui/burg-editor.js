@@ -388,6 +388,7 @@ function editBurg(id) {
     const capital = burgsToRemove.length < burgsInGroup.length;
 
     alertMessage.innerHTML = `Are you sure you want to remove
+<<<<<<<<< Temporary merge branch 1
       ${
         basic || capital
           ? "all unlocked elements in the group"
@@ -398,7 +399,7 @@ function editBurg(id) {
       <br><br>Burgs to be removed: ${burgsToRemove.length}`;
     $("#alert").dialog({
       resizable: false,
-      title: "Remove burg group",
+      title: "Remove route group",
       buttons: {
         Remove: function () {
           $(this).dialog("close");
@@ -615,7 +616,6 @@ function editBurg(id) {
     const url = `${baseURL}&name=${name}&population=${people}&size=${size}&seed=${burgSeed}&hub=${hub}&river=${river}&coast=${coast}&citadel=${citadel}&plaza=${plaza}&temple=${temple}&walls=${walls}&shantytown=${shanty}${sea}`;
     return url;
   }
-
 
   function changeSeed() {
     const id = +elSelected.attr("data-id");
