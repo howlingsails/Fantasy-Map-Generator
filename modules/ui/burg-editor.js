@@ -393,11 +393,12 @@ function editBurg(id) {
           ? "all unlocked elements in the group"
           : "the entire burg group"
       }?
+
       <br>Please note that capital or locked burgs will not be deleted.
       <br><br>Burgs to be removed: ${burgsToRemove.length}`;
     $("#alert").dialog({
       resizable: false,
-      title: "Remove route group",
+      title: "Remove burg group",
       buttons: {
         Remove: function () {
           $(this).dialog("close");
@@ -614,6 +615,7 @@ function editBurg(id) {
     const url = `${baseURL}&name=${name}&population=${people}&size=${size}&seed=${burgSeed}&hub=${hub}&river=${river}&coast=${coast}&citadel=${citadel}&plaza=${plaza}&temple=${temple}&walls=${walls}&shantytown=${shanty}${sea}`;
     return url;
   }
+
 
   function changeSeed() {
     const id = +elSelected.attr("data-id");

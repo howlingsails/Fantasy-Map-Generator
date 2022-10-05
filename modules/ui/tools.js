@@ -470,9 +470,10 @@ function addLabelOnClick() {
   const id = getNextId("label");
 
   // use most recently selected label group
-  let selected = labelGroupSelect.value;
-  const symbol = selected ? "#" + selected : "#addedLabels";
-  let group = labels.select(symbol);
+  const lastSelected = labelGroupSelect.value;
+  const groupId = ["", "states", "burgLabels"].includes(lastSelected) ? "#addedLabels" : "#" + lastSelected;
+
+  let group = labels.select(groupId);
   if (!group.size())
     group = labels
       .append("g")
@@ -703,9 +704,9 @@ function addMarkerOnClick() {
   const point = d3.mouse(this);
   const x = rn(point[0], 2);
   const y = rn(point[1], 2);
-  const i = last(markers).i + 1;
+  const i = markers.length ? last(markers).i + 1 : 0;
 
-  const isMarkerSelected = elSelected?.node()?.parentElement?.id === "markers";
+  const isMarkerSelected = markers.length && elSelected?.node()?.parentElement?.id === "markers";
   const selectedMarker = isMarkerSelected ? markers.find(marker => marker.i === +elSelected.attr("id").slice(6)) : null;
   const baseMarker = selectedMarker || {icon: "❓"};
   const marker = {...baseMarker, i, x, y};
