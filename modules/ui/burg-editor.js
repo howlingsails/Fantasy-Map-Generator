@@ -539,45 +539,9 @@ function editBurg(id) {
   }
 
   function getBurgLink(burg) {
-    const { cells } = pack;
-    let burgCulture = pack.cultures[burg.culture].name
-      .split("(")[1]
-      .split(")")[0];
-
-    const { name, population, cell } = burg;
-    const burgSeed = getBurgSeed(burg);
-    const sizeRaw =
-      0.43 * Math.pow((population * populationRate) / urbanDensity, 0.385);
-    const size = minmax(Math.ceil(sizeRaw), 2, 40);
-    const people = rn(population * populationRate * urbanization);
-    const hub = +cells.road[cell] > 50;
-    const river = cells.r[cell] ? 1 : 0;
-
-    const coast = +burg.port;
-    const citadel = +burg.citadel;
-    const walls = +burg.walls;
-    const plaza = +burg.plaza;
-    const temple = +burg.temple;
-    const shanty = +burg.shanty;
-
     const worldName = mapName.value;
-    const sea = coast && cells.haven[cell] ? getSeaDirections(cell) : "";
-    function getSeaDirections(i) {
-      const p1 = cells.p[i];
-      const p2 = cells.p[cells.haven[i]];
-      let deg = (Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180) / Math.PI - 90;
-      if (deg < 0) deg += 360;
-      const norm = rn(normalize(deg, 0, 360) * 2, 2); // 0 = south, 0.5 = west, 1 = north, 1.5 = east
-      return "&sea=" + norm;
-    }
-    let townSize = "tiny";
-    if (people > 200) townSize = "small";
-    if (people > 900) townSize = "medium";
-    if (people > 2_000) townSize = "average";
-    if (people > 5_500) townSize = "big";
     const baseURL = "http://localhost:9090/world/";
     const url = `${baseURL}${worldName}/burg/${burg.i}`;
-
     return url;
   }
 
