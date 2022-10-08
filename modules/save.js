@@ -1,6 +1,5 @@
 "use strict";
 // functions to save project as .map file
-
 // prepare map data for saving
 function getMapData() {
   TIME && console.time("createMapData");
@@ -145,7 +144,7 @@ function getMapData() {
 // Download .map file
 function downloadMapOrig() {
   const mapData = getMapData();
-  const blob = new Blob([mapData], { type: "text/plain" });
+  const blob = new Blob([mapData], {type: "text/plain"});
   const URL = window.URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.download = getFileName() + ".map";
@@ -162,6 +161,7 @@ function downloadMarkers() {
   link.href = URL;
   link.click();
 }
+
 
 function downloadBurgs() {
   const mapData = JSON.stringify(pack.burgs);
@@ -224,14 +224,14 @@ function downloadPopRates() {
   link.click();
 }
 
-function dowloadMap() {
+const downloadMap = function () {
   if (customization)
     return tip(
       "Map cannot be saved when edit mode is active, please exit the mode and retry",
       false,
       "error"
     );
-  closeDialogs("#alert");
+
   downloadMapOrig();
   downloadMarkers();
   downloadBurgs();
@@ -240,7 +240,7 @@ function dowloadMap() {
   downloadReligions();
   downloadPopRates();
   downloadStates();
-
+  closeDialogs("#alert");
   window.URL.revokeObjectURL(URL);
 }
 
