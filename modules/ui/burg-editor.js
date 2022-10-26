@@ -541,7 +541,7 @@ function editBurg(id) {
 
   function getBurgLink(burg) {
     const worldName = mapName.value;
-    const baseURL = "http://localhost:9090/world/";
+    const baseURL = "https://howlingsails.com/world_vision/world/";
     const url = `${baseURL}${worldName}/burg/${burg.i}`;
     return url;
   }
