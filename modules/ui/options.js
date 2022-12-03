@@ -593,6 +593,7 @@ function randomizeCultureSet() {
     antique: 3,
     highFantasy: 11,
     darkFantasy: 3,
+    howlingSailsFantasy: 11,
     random: 1
   };
   culturesSet.value = rw(sets);

@@ -121,10 +121,7 @@ function getMapData() {
 }
 
 // Download .map file
-function dowloadMap() {
-  if (customization) return tip("Map cannot be saved when edit mode is active, please exit the mode and retry", false, "error");
-  closeDialogs("#alert");
-
+function downloadMapOrig() {
   const mapData = getMapData();
   const blob = new Blob([mapData], {type: "text/plain"});
   const URL = window.URL.createObjectURL(blob);
@@ -132,7 +129,109 @@ function dowloadMap() {
   link.download = getFileName() + ".map";
   link.href = URL;
   link.click();
-  tip(`${link.download} is saved. Open "Downloads" screen (CTRL + J) to check`, true, "success", 7000);
+}
+
+function downloadMarkers() {
+  const mapData = JSON.stringify(pack.markers);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-markers.json";
+  link.href = URL;
+  link.click();
+}
+
+
+function downloadBurgs() {
+  const mapData = JSON.stringify(pack.burgs);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-burgs.json";
+  link.href = URL;
+  link.click();
+}
+
+function downloadReligions() {
+  const mapData = JSON.stringify(pack.religions);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-religions.json";
+  link.href = URL;
+  link.click();
+}
+function downloadCultures() {
+  const mapData = JSON.stringify(pack.cultures);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-cultures.json";
+  link.href = URL;
+  link.click();
+}
+
+function downloadStates() {
+  const mapData = JSON.stringify(pack.states);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-states.json";
+  link.href = URL;
+  link.click();
+}
+
+
+
+function downloadCells() {
+  const mapData = JSON.stringify(pack.cells);
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-cells.json";
+  link.href = URL;
+  link.click();
+}
+
+function downloadPopRates() {
+  const mapData = populationRate * urbanization;
+  const blob = new Blob([mapData], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-poprate.txt";
+  link.href = URL;
+  link.click();
+}
+
+function downloadNotes() {
+  const notesdata = JSON.stringify(notes);
+  const blob = new Blob([notesdata], { type: "text/plain" });
+  const URL = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.download = getFileName() + "-notes.json";
+  link.href = URL;
+  link.click();
+}
+
+
+const downloadMap = function () {
+  if (customization)
+    return tip(
+        "Map cannot be saved when edit mode is active, please exit the mode and retry",
+        false,
+        "error"
+    );
+
+  downloadMapOrig();
+  downloadMarkers();
+  downloadBurgs();
+  downloadCultures();
+  downloadCells();
+  downloadReligions();
+  downloadPopRates();
+  downloadStates();
+  downloadNotes();
+  closeDialogs("#alert");
   window.URL.revokeObjectURL(URL);
 }
 

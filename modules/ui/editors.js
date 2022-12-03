@@ -818,15 +818,8 @@ function unfog(id) {
 function getFileName(dataType) {
   const formatTime = time => (time < 10 ? "0" + time : time);
   const name = mapName.value;
-  const type = dataType ? dataType + " " : "";
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = formatTime(date.getMonth() + 1);
-  const day = formatTime(date.getDate());
-  const hour = formatTime(date.getHours());
-  const minutes = formatTime(date.getMinutes());
-  const dateString = [year, month, day, hour, minutes].join("-");
-  return name + " " + type + dateString;
+
+  return name ;
 }
 
 function downloadFile(data, name, type = "text/plain") {

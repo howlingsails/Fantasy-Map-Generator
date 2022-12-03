@@ -1586,6 +1586,7 @@
                   <option value="antique" data-max="10">Antique</option>
                   <option value="highFantasy" data-max="17">High Fantasy</option>
                   <option value="darkFantasy" data-max="18">Dark Fantasy</option>
+                  <option value="howlingSailsFantasy" data-max="11">Wold Fantasy Vision Fantasy</option>
                   <option value="random" data-max="100">Random</option>
                 </select>
               </td>
@@ -3239,7 +3240,11 @@
             <iframe id="mfcgPreview" sandbox="allow-scripts allow-same-origin"></iframe>
           </div>
         </div>
-
+        <div id="burgDetails">
+          <a id="burgGenerator" target="_blank" >
+            Burg Details by World Fantasy Visions
+          </a>
+          <hr>
         <div id="burgBottom">
           <button id="burgGroupShow" data-tip="Show group change section" class="icon-tags"></button>
           <div id="burgGroupSection" style="display: none">
@@ -5782,7 +5787,7 @@
       <div id="saveMapData" style="display: none" class="dialog">
         <div style="margin-top: 0.3em">
           <strong>Save map to</strong>
-          <button onclick="dowloadMap()" data-tip="Download .map file to your local disk" data-shortcut="Ctrl + S">
+          <button onclick="downloadMap()" data-tip="Download .map file to your local disk" data-shortcut="Ctrl + S">
             machine
           </button>
           <button onclick="saveToDropbox()" data-tip="Save .map file to your Dropbox" data-shortcut="Ctrl + C">

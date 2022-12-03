@@ -343,6 +343,7 @@ window.Cultures = (function () {
       ];
     }
 
+
     if (culturesSet.value === "darkFantasy") {
       return [
         // common real-world English
@@ -416,6 +417,52 @@ window.Cultures = (function () {
       ];
     }
 
+    if (culturesSet.value === "howlingSailsFantasy") {
+      return [
+        // fantasy races
+        {
+          name: "Aeson (Elfish)",
+          base: 33,
+          odd: 2,
+          sort: i => (n(i) / bd(i, [6, 7, 8, 9], 10)) * t[i],
+          shield: "gondor"
+        }, // Elves
+        {
+          name: "Filvendor (Elfish)",
+          base: 33,
+          odd: 2,
+          sort: i => (n(i) / bd(i, [6, 7, 8, 9], 10)) * t[i],
+          shield: "noldor"
+        }, // Elves
+        {name: "Berrouk (Dwarven)", base: 35, odd: 1, sort: i => n(i) + h[i], shield: "ironHills"}, // Dwarfs
+        {name: "Runurum (Dwarven)", base: 35, odd: 2, sort: i => n(i) + h[i], shield: "erebor"}, // Dwarfs
+        {name: "Eberulf (Halfling)", base: 36, odd: 3, sort: i => t[i] - s[i], shield: "moriaOrc"}, // Goblin
+        {name: "Dugarod (Orkish)", base: 37, odd: 1, sort: i => h[i] * t[i], shield: "urukHai"}, // Orc
+        {
+          name: "Surgug (Orkish)",
+          base: 37,
+          odd: 0.5,
+          sort: i => (h[i] * t[i]) / bd(i, [1, 2, 10, 11]),
+          shield: "moriaOrc"
+        }, // Orc
+        // fantasy human
+        {name: "Yanien (Human)", base: 32, odd: 3, sort: i => n(i) / td(i, 10), shield: "fantasy5"},
+        {name: "Lakitrius (Human)", base: 32, odd: 1, sort: i => n(i) / td(i, 13), shield: "roman"},
+        {name: "Chrisysios (Human)", base: 16, odd: 1, sort: i => n(i) / td(i, 16), shield: "round"},
+        {
+          name: "Philerus (Human)",
+          base: 31,
+          odd: 1,
+          sort: i => (n(i) / td(i, 5) / bd(i, [2, 4, 10], 7)) * t[i],
+          shield: "easterling"
+        },
+        {name: "Namur (Gnomish)", base: 16, odd: 3, sort: i => n(i) / td(i, 16), shield: "round"},
+
+      ];
+    }
+
+
+
     if (culturesSet.value === "random") {
       return d3.range(count).map(function () {
         const rnd = rand(nameBases.length - 1);
@@ -423,6 +470,7 @@ window.Cultures = (function () {
         return {name, base: rnd, odd: 1, shield: getRandomShield()};
       });
     }
+
 
     // all-world
     return [
