@@ -44,7 +44,8 @@ function editProvinces() {
       cl = el.classList,
       line = el.parentNode,
       p = +line.dataset.id;
-    if (cl.contains("fillRect")) changeFill(el);
+
+    if (el.tagName === "FILL-BOX") changeFill(el);
     else if (cl.contains("name")) editProvinceName(p);
     else if (cl.contains("coaIcon")) editEmblem("province", "provinceCOA" + p, pack.provinces[p]);
     else if (cl.contains("icon-star-empty")) capitalZoomIn(p);
@@ -107,7 +108,7 @@ function editProvinces() {
 
   // add line for each state
   function provincesEditorAddLines() {
-    const unit = areaUnit.value === "square" ? " " + distanceUnitInput.value + "²" : " " + areaUnit.value;
+    const unit = " " + getAreaUnit();
     const selectedState = +document.getElementById("provincesFilterState").value;
     let filtered = pack.provinces.filter(p => p.i && !p.removed); // all valid burgs
     if (selectedState != -1) filtered = filtered.filter(p => p.state === selectedState); // filtered by state
@@ -117,7 +118,7 @@ function editProvinces() {
       totalPopulation = 0;
 
     for (const p of filtered) {
-      const area = p.area * distanceScaleInput.value ** 2;
+      const area = getArea(p.area);
       totalArea += area;
       const rural = p.rural * populationRate;
       const urban = p.urban * populationRate * urbanization;
@@ -130,27 +131,37 @@ function editProvinces() {
       const separable = p.burg && p.burg !== pack.states[p.state].capital;
       const focused = defs.select("#fog #focusProvince" + p.i).size();
       COArenderer.trigger("provinceCOA" + p.i, p.coa);
-      lines += `<div class="states" data-id=${p.i} data-name="${p.name}" data-form="${p.formName}" data-color="${
-        p.color
-      }" data-capital="${capital}" data-state="${stateName}" data-area=${area} data-population=${population}>
-        <svg data-tip="Province fill style. Click to change" width=".9em" height=".9em" style="margin-bottom:-1px"><rect x="0" y="0" width="100%" height="100%" fill="${
-          p.color
-        }" class="fillRect pointer"></svg>
-        <input data-tip="Province name. Click to change" class="name pointer" value="${p.name}" readonly>
-        <svg data-tip="Click to show and edit province emblem" class="coaIcon hide" viewBox="0 0 200 200"><use href="#provinceCOA${p.i}"></use></svg>
-        <input data-tip="Province form name. Click to change" class="name pointer hide" value="${p.formName}" readonly>
+      lines += /* html */ `<div
+        class="states"
+        data-id=${p.i}
+        data-name="${p.name}"
+        data-form="${p.formName}"
+        data-color="${p.color}"
+        data-capital="${capital}"
+        data-state="${stateName}"
+        data-area=${area}
+        data-population=${population}
+      >
+        <fill-box fill="${p.color}"></fill-box>
+        <input data-tip="Province name. Click to change" class="name pointer" value="${p.name}" readonly />
+        <svg data-tip="Click to show and edit province emblem" class="coaIcon pointer hide" viewBox="0 0 200 200"><use href="#provinceCOA${p.i}"></use></svg>
+        <input data-tip="Province form name. Click to change" class="name pointer hide" value="${p.formName}" readonly />
         <span data-tip="Province capital. Click to zoom into view" class="icon-star-empty pointer hide ${p.burg ? "" : "placeholder"}"></span>
-        <select data-tip="Province capital. Click to select from burgs within the state. No capital means the province is governed from the state capital" class="cultureBase hide ${
-          p.burgs.length ? "" : "placeholder"
-        }">${p.burgs.length ? getCapitalOptions(p.burgs, p.burg) : ""}</select>
+        <select
+          data-tip="Province capital. Click to select from burgs within the state. No capital means the province is governed from the state capital"
+          class="cultureBase hide ${p.burgs.length ? "" : "placeholder"}"
+        >
+          ${p.burgs.length ? getCapitalOptions(p.burgs, p.burg) : ""}
+        </select>
         <input data-tip="Province owner" class="provinceOwner" value="${stateName}" disabled">
         <span data-tip="Province area" style="padding-right: 4px" class="icon-map-o hide"></span>
         <div data-tip="Province area" class="biomeArea hide">${si(area) + unit}</div>
         <span data-tip="${populationTip}" class="icon-male hide"></span>
         <div data-tip="${populationTip}" class="culturePopulation hide">${si(population)}</div>
-        <span data-tip="Declare province independence (turn non-capital province with burgs into a new state)" class="icon-flag-empty ${
-          separable ? "" : "placeholder"
-        } hide"></span>
+        <span
+          data-tip="Declare province independence (turn non-capital province with burgs into a new state)"
+          class="icon-flag-empty ${separable ? "" : "placeholder"} hide"
+        ></span>
         <span data-tip="Toggle province focus" class="icon-pin ${focused ? "" : " inactive"} hide"></span>
         <span data-tip="Remove the province" class="icon-trash-empty hide"></span>
       </div>`;
@@ -215,14 +226,14 @@ function editProvinces() {
 
   function changeFill(el) {
     const currentFill = el.getAttribute("fill");
-    const p = +el.parentNode.parentNode.dataset.id;
+    const p = +el.parentNode.dataset.id;
 
-    const callback = function (fill) {
-      el.setAttribute("fill", fill);
-      pack.provinces[p].color = fill;
+    const callback = newFill => {
+      el.fill = newFill;
+      pack.provinces[p].color = newFill;
       const g = provs.select("#provincesBody");
-      g.select("#province" + p).attr("fill", fill);
-      g.select("#province-gap" + p).attr("stroke", fill);
+      g.select("#province" + p).attr("fill", newFill);
+      g.select("#province-gap" + p).attr("stroke", newFill);
     };
 
     openPicker(currentFill, callback);
@@ -361,10 +372,9 @@ function editProvinces() {
     const total = rural + urban;
     const l = n => Number(n).toLocaleString();
 
-    alertMessage.innerHTML = `
-    Rural: <input type="number" min=0 step=1 id="ruralPop" value=${rural} style="width:6em">
-    Urban: <input type="number" min=0 step=1 id="urbanPop" value=${urban} style="width:6em" ${p.burgs.length ? "" : "disabled"}>
-    <p>Total population: ${l(total)} ⇒ <span id="totalPop">${l(total)}</span> (<span id="totalPopPerc">100</span>%)</p>`;
+    alertMessage.innerHTML = /* html */ ` Rural: <input type="number" min="0" step="1" id="ruralPop" value=${rural} style="width:6em" /> Urban:
+      <input type="number" min="0" step="1" id="urbanPop" value=${urban} style="width:6em" ${p.burgs.length ? "" : "disabled"} />
+      <p>Total population: ${l(total)} ⇒ <span id="totalPop">${l(total)}</span> (<span id="totalPopPerc">100</span>%)</p>`;
 
     const update = function () {
       const totalNew = ruralPop.valueAsNumber + urbanPop.valueAsNumber;
@@ -425,7 +435,7 @@ function editProvinces() {
   }
 
   function removeProvince(p) {
-    alertMessage.innerHTML = `Are you sure you want to remove the province? <br>This action cannot be reverted`;
+    alertMessage.innerHTML = /* html */ `Are you sure you want to remove the province? <br />This action cannot be reverted`;
     $("#alert").dialog({
       resizable: false,
       title: "Remove province",
@@ -589,7 +599,7 @@ function editProvinces() {
     const treeLayout = d3.treemap().size([w, h]).padding(2);
 
     // prepare svg
-    alertMessage.innerHTML = `<select id="provincesTreeType" style="display:block; margin-left:13px; font-size:11px">
+    alertMessage.innerHTML = /* html */ `<select id="provincesTreeType" style="display:block; margin-left:13px; font-size:11px">
       <option value="area" selected>Area</option>
       <option value="population">Total population</option>
       <option value="rural">Rural population</option>
@@ -622,8 +632,7 @@ function editProvinces() {
       const name = d.data.fullName;
       const state = pack.states[d.data.state].fullName;
 
-      const unit = areaUnit.value === "square" ? " " + distanceUnitInput.value + "²" : " " + areaUnit.value;
-      const area = d.data.area * distanceScaleInput.value ** 2 + unit;
+      const area = getArea(d.data.area) + " " + getAreaUnit();
       const rural = rn(d.data.rural * populationRate);
       const urban = rn(d.data.urban * populationRate * urbanization);
 
@@ -636,7 +645,7 @@ function editProvinces() {
           ? "Urban population: " + si(urban)
           : "Population: " + si(rural + urban);
 
-      provinceInfo.innerHTML = `${name}. ${state}. ${value}`;
+      provinceInfo.innerHTML = /* html */ `${name}. ${state}. ${value}`;
       provinceHighlightOn(ev);
     }
 
@@ -1028,7 +1037,7 @@ function editProvinces() {
   }
 
   function removeAllProvinces() {
-    alertMessage.innerHTML = `Are you sure you want to remove all provinces? <br>This action cannot be reverted`;
+    alertMessage.innerHTML = /* html */ `Are you sure you want to remove all provinces? <br />This action cannot be reverted`;
     $("#alert").dialog({
       resizable: false,
       title: "Remove all provinces",

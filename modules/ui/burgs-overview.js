@@ -7,6 +7,7 @@ function overviewBurgs() {
 
   const body = document.getElementById("burgsBody");
   updateFilter();
+  updateLockAllIcon();
   burgsOverviewAddLines();
   $("#burgsOverview").dialog();
 
@@ -33,6 +34,7 @@ function overviewBurgs() {
   document.getElementById("burgsListToLoad").addEventListener("change", function () {
     uploadFile(this, importBurgNames);
   });
+  document.getElementById("burgsLockAll").addEventListener("click", toggleLockAll);
   document.getElementById("burgsRemoveAll").addEventListener("click", triggerAllBurgsRemove);
   document.getElementById("burgsInvertLock").addEventListener("click", invertLock);
 
@@ -80,22 +82,30 @@ function overviewBurgs() {
       const province = prov ? pack.provinces[prov].name : "";
       const culture = pack.cultures[b.culture].name;
 
-      lines += `<div class="states" data-id=${b.i} data-name="${
-        b.name
-      }" data-state="${state}" data-province="${province}" data-culture="${culture}" data-population=${population} data-type="${type}">
+      lines += /* html */ `<div
+        class="states"
+        data-id=${b.i}
+        data-name="${b.name}"
+        data-state="${state}"
+        data-province="${province}"
+        data-culture="${culture}"
+        data-population=${population}
+        data-type="${type}"
+      >
         <span data-tip="Click to zoom into view" class="icon-dot-circled pointer"></span>
-        <input data-tip="Burg name. Click and type to change" class="burgName" value="${b.name}" autocorrect="off" spellcheck="false">
-        <input data-tip="Burg province" class="burgState" value="${province}" disabled>
-        <input data-tip="Burg state" class="burgState" value="${state}" disabled>
-        <select data-tip="Dominant culture. Click to change burg culture (to change cell cultrure use Cultures Editor)" class="stateCulture">${getCultureOptions(
-          b.culture
-        )}</select>
+        <input data-tip="Burg name. Click and type to change" class="burgName" value="${b.name}" autocorrect="off" spellcheck="false" />
+        <input data-tip="Burg province" class="burgState" value="${province}" disabled />
+        <input data-tip="Burg state" class="burgState" value="${state}" disabled />
+        <select data-tip="Dominant culture. Click to change burg culture (to change cell culture use Cultures Editor)" class="stateCulture">
+          ${getCultureOptions(b.culture)}
+        </select>
         <span data-tip="Burg population" class="icon-male"></span>
-        <input data-tip="Burg population. Type to change" class="burgPopulation" value=${si(population)}>
+        <input data-tip="Burg population. Type to change" class="burgPopulation" value=${si(population)} />
         <div class="burgType">
-          <span data-tip="${b.capital ? " This burg is a state capital" : "Click to assign a capital status"}" class="icon-star-empty${
-        b.capital ? "" : " inactive pointer"
-      }"></span>
+          <span
+            data-tip="${b.capital ? " This burg is a state capital" : "Click to assign a capital status"}"
+            class="icon-star-empty${b.capital ? "" : " inactive pointer"}"
+          ></span>
           <span data-tip="Click to toggle port status" class="icon-anchor pointer${b.port ? "" : " inactive"}" style="font-size:.9em"></span>
         </div>
         <span data-tip="Edit burg" class="icon-pencil"></span>
@@ -195,8 +205,11 @@ function overviewBurgs() {
   }
 
   function toggleBurgLockStatus() {
-    const burg = +this.parentNode.dataset.id;
-    toggleBurgLock(burg);
+    const burgId = +this.parentNode.dataset.id;
+
+    const burg = pack.burgs[burgId];
+    burg.lock = !burg.lock;
+
     if (this.classList.contains("icon-lock")) {
       this.classList.remove("icon-lock");
       this.classList.add("icon-lock-open");
@@ -307,11 +320,12 @@ function overviewBurgs() {
     const treeLayout = d3.pack().size([w, h]).padding(3);
 
     // prepare svg
-    alertMessage.innerHTML = `<select id="burgsTreeType" style="display:block; margin-left:13px; font-size:11px">
+    alertMessage.innerHTML = /* html */ `<select id="burgsTreeType" style="display:block; margin-left:13px; font-size:11px">
       <option value="states" selected>Group by state</option>
       <option value="cultures">Group by culture</option>
       <option value="parent">Group by province and state</option>
-      <option value="provinces">Group by province</option></select>`;
+      <option value="provinces">Group by province</option>
+    </select>`;
     alertMessage.innerHTML += `<div id='burgsInfo' class='chartInfo'>&#8205;</div>`;
     const svg = d3
       .select("#alertMessage")
@@ -344,7 +358,7 @@ function overviewBurgs() {
       const parent = d.parent.data.name;
       const population = si(d.value * populationRate * urbanization);
 
-      burgsInfo.innerHTML = `${name}. ${parent}. Population: ${population}`;
+      burgsInfo.innerHTML = /* html */ `${name}. ${parent}. Population: ${population}`;
       burgHighlightOn(ev);
       tip("Click to zoom into view");
     }
@@ -478,9 +492,8 @@ function overviewBurgs() {
   }
 
   function renameBurgsInBulk() {
-    const message = `Download burgs list as a text file, make changes and re-upload the file.
-    If you do not want to change the name, just leave it as is`;
-    alertMessage.innerHTML = message;
+    alertMessage.innerHTML = /* html */ `Download burgs list as a text file, make changes and re-upload the file. Make sure the file is a plain text document with each
+    name on its own line (the dilimiter is CRLF). If you do not want to change the name, just leave it as is`;
 
     $("#alert").dialog({
       title: "Burgs bulk renaming",
@@ -561,5 +574,22 @@ function overviewBurgs() {
   function invertLock() {
     pack.burgs = pack.burgs.map(burg => ({...burg, lock: !burg.lock}));
     burgsOverviewAddLines();
+  }
+
+  function toggleLockAll() {
+    const activeBurgs = pack.burgs.filter(b => b.i && !b.removed);
+    const allLocked = activeBurgs.every(burg => burg.lock);
+
+    pack.burgs.forEach(burg => {
+      burg.lock = !allLocked;
+    });
+
+    burgsOverviewAddLines();
+    document.getElementById("burgsLockAll").className = allLocked ? "icon-lock" : "icon-lock-open";
+  }
+
+  function updateLockAllIcon() {
+    const allLocked = pack.burgs.every(({lock, i, removed}) => lock || !i || removed);
+    document.getElementById("burgsLockAll").className = allLocked ? "icon-lock-open" : "icon-lock";
   }
 }

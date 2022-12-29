@@ -3,7 +3,7 @@ function editWorld() {
   $("#worldConfigurator").dialog({
     title: "Configure World",
     resizable: false,
-    width: "42em",
+    width: "minmax(40em, 85vw)",
     buttons: {
       "Whole World": () => applyWorldPreset(100, 50),
       Northern: () => applyWorldPreset(33, 25),
@@ -73,9 +73,9 @@ function editWorld() {
     const eqD = ((graphHeight / 2) * 100) / size;
 
     calculateMapCoordinates();
-    const mc = mapCoordinates; // shortcut
-    const scale = +distanceScaleInput.value,
-      unit = distanceUnitInput.value;
+    const mc = mapCoordinates;
+    const scale = +distanceScaleInput.value;
+    const unit = distanceUnitInput.value;
     const meridian = toKilometer(eqD * 2 * scale);
     document.getElementById("mapSize").innerHTML = `${graphWidth}x${graphHeight}`;
     document.getElementById("mapSizeFriendly").innerHTML = `${rn(graphWidth * scale)}x${rn(graphHeight * scale)} ${unit}`;
@@ -92,9 +92,11 @@ function editWorld() {
       return 0; // 0 if distanceUnitInput is a custom unit
     }
 
+    // parse latitude value
     function lat(lat) {
       return lat > 0 ? Math.abs(rn(lat)) + "°N" : Math.abs(rn(lat)) + "°S";
-    } // parse latitude value
+    }
+
     const area = d3.geoGraticule().extent([
       [mc.lonW, mc.latN],
       [mc.lonE, mc.latS]

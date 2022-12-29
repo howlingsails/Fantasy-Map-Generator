@@ -1,7 +1,5 @@
-.bat
 .vscode
 .idea
-yarn.lock
-.gitignore
-node_modules
-yarn-error.log
+/node_modules
+/dist
+/coverage

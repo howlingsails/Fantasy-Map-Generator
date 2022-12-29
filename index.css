@@ -29,16 +29,19 @@ input:read-only {
   cursor: default;
 }
 
+input[type="radio"] {
+  vertical-align: bottom;
+  cursor: pointer;
+}
+
 textarea {
-  padding: 2px;
-  text-indent: 1px;
+  padding: 3px;
   box-sizing: border-box;
   width: 100%;
 }
 
 iframe {
   border: 0;
-  pointer-events: none;
   width: 100%;
 }
 
@@ -47,6 +50,7 @@ iframe {
   mask-mode: alpha;
   mask-clip: no-clip;
   fill-rule: evenodd;
+  user-select: none;
 }
 
 #canvas {
@@ -250,13 +254,6 @@ i.icon-lock {
   font-size: 12px;
 }
 
-#hierarchy .selected {
-  stroke: #c13119;
-  stroke-width: 1;
-  cursor: move;
-}
-
-#hierarchy text,
 #statesTree text,
 #provincesTree text {
   pointer-events: none;
@@ -277,7 +274,7 @@ i.icon-lock {
   stroke-width: 2;
 }
 
-.dragLine {
+.regimentDragLine {
   marker-end: url(#end-arrow);
   stroke: #333333;
   stroke-dasharray: 5;
@@ -346,6 +343,20 @@ text.drag {
 .ui-dialog,
 #optionsContainer {
   user-select: none;
+}
+
+#optionsTrigger {
+  padding: 0.6em 0.45em;
+}
+
+@media (max-width: 600px) {
+  #optionsTrigger {
+    font-size: 2em;
+    padding: 0;
+    width: 1.3em;
+    height: 1.6em;
+    border: solid 1px #5e4fa2;
+  }
 }
 
 #options {
@@ -840,75 +851,79 @@ fieldset {
 }
 
 .matrix-table {
-  width: 100%;
-  font-size: smaller;
-  text-align: center;
-  border-collapse: collapse;
+  max-height: 80vh;
+  max-width: 85vw;
+  scrollbar-width: thin;
+  overflow: auto;
 }
 
-table.matrix-table th,
-table.matrix-table td {
+.matrix-table > table {
+  text-align: center;
+  border-collapse: collapse;
+  font-size: smaller;
+}
+
+.matrix-table > table th,
+.matrix-table > table td {
   border: 1px solid var(--dark-solid);
   height: 2em;
   padding: 0.2em;
   position: relative;
 }
 
-table.matrix-table th {
+.matrix-table > table th {
   background-color: #302a2a;
   color: #ffffff;
 }
 
-table.matrix-table tr:hover th {
-  background: #3e3636;
-}
-
-table.matrix-table td:hover {
+.matrix-table > table td:hover {
   outline: 2px solid var(--dark-solid);
   outline-offset: -1px;
   z-index: 1;
+  cursor: pointer;
 }
 
-table.matrix-table td.Ally {
+.matrix-table > table td.Ally {
   background-color: #73ec73;
   color: #000000;
 }
 
-table.matrix-table td.Friendly {
+.matrix-table > table td.Friendly {
   background-color: #d4f8aa;
 }
 
-table.matrix-table td.Neutral {
+.matrix-table > table td.Neutral {
   background-color: #d8d9d3;
 }
 
-table.matrix-table td.Suspicion {
+.matrix-table > table td.Suspicion {
   background-color: #eeafaa;
 }
 
-table.matrix-table td.Enemy {
+.matrix-table > table td.Enemy {
   background-color: #ffa39c;
   color: #af0d23;
 }
 
-table.matrix-table td.Unknown {
+.matrix-table > table td.Unknown {
   background-color: #c1bfbf;
 }
 
-table.matrix-table td.Rival {
+.matrix-table > table td.Rival {
   background-color: #bd845c;
 }
 
-table.matrix-table td.Vassal {
+.matrix-table > table td.Vassal {
   background-color: #87cefa;
 }
 
-table.matrix-table td.Suzerain {
+.matrix-table > table td.Suzerain {
   background-color: #8f8fe1;
 }
 
-table.matrix-table td.x {
+.matrix-table > table td.x {
   background-color: #d4ca94;
+  cursor: initial;
 }
 
 #sizeOutput {
@@ -919,14 +934,14 @@ table.matrix-table td.x {
   display: inline-block;
 }
 
-body button.noicon {
+#templateTools > button {
   width: 1.8em;
   height: 1.6em;
   margin: 1px;
   padding: 0.1em 0.5em;
   float: left;
   font-size: 1.2em;
-  font-family: Copperplate, monospace;
+  font-family: monospace;
 }
 
 #brushesButtons > button {
@@ -1133,12 +1148,17 @@ div#regimentSelectorBody > div > div {
   filter: sepia(1) hue-rotate(200deg);
 }
 
+.colorsContainer {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-column-gap: 0.3em;
+  grid-row-gap: 0.2em;
+}
+
 .color-div {
   width: 3em;
-  height: 1em;
-  display: inline-block;
-  margin: 0 0.16em;
-  border: 1px #c5c5c5 groove;
+  height: 1.5em;
+  border: 1px #999 solid;
   cursor: pointer;
 }
 
@@ -1288,11 +1308,6 @@ div.slider .ui-slider-handle {
   color: white;
 }
 
-#brushPower,
-#brushRadius {
-  width: 12em;
-}
-
 #rescaleHigher,
 #rescaleLower,
 #rescaleModifier {
@@ -1315,41 +1330,53 @@ div.slider .ui-slider-handle {
   scrollbar-width: thin;
 }
 
+@media screen and (max-width: 600px) {
+  .table {
+    max-width: unset;
+  }
+}
+
+.dialog::-webkit-scrollbar,
 #alertMessage::-webkit-scrollbar,
-.table::-webkit-scrollbar {
+.table::-webkit-scrollbar,
+.matrix-table::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
   background-color: transparent;
 }
 
+.dialog::-webkit-scrollbar-thumb,
 #alertMessage::-webkit-scrollbar-thumb,
-.table::-webkit-scrollbar-thumb {
+.table::-webkit-scrollbar-thumb,
+.matrix-table::-webkit-scrollbar-thumb {
   background-color: #aaa;
   border-radius: 6px;
 }
 
+.dialog::-webkit-scrollbar-thumb:hover,
 #alertMessage::-webkit-scrollbar-thumb:hover,
-.table::-webkit-scrollbar-thumb:hover {
+.table::-webkit-scrollbar-thumb:hover,
+.matrix-table::-webkit-scrollbar-thumb:hover {
   background: #666;
 }
 
-.overflow {
+.dialog {
   max-width: 93vw;
-  overflow: auto;
-  max-height: 75vh;
 }
 
-.overflow > div {
+.dialog > div {
   width: max-content;
 }
 
-div.header > div {
+div.header {
+  display: grid;
+  width: 0;
   font-weight: bold;
   font-size: 0.9em;
-  display: inline-block;
-  position: sticky;
-  white-space: nowrap;
-  overflow-x: hidden;
-  vertical-align: bottom;
+}
+
+div.header > div:first-child {
+  margin-left: 1.8em;
 }
 
 .sortable {
@@ -1389,7 +1416,7 @@ div.totalLine > div {
 }
 
 div.states > input {
-  width: 6em;
+  width: 7em;
   background: none;
   border: 0;
 }
@@ -1398,18 +1425,9 @@ div.states div {
   width: 3.2em;
 }
 
-div.states .statePower,
 div.states .biomeHabitability {
   width: 4em;
   -moz-appearance: textfield;
-}
-
-div.states .stateBurgs {
-  width: 2.4em;
-}
-
-div.states > .stateArea {
-  width: 5em;
 }
 
 div.states > .statePopulation {
@@ -1454,17 +1472,8 @@ div.states > .small {
   font-size: 0.9em;
 }
 
-div.states > .cultureName {
-  width: 7em;
-}
-
-div.states > .culturePopulation {
-  width: 4em;
-  cursor: pointer;
-}
-
 div.states > select {
-  width: 4.6em;
+  width: 7em;
   cursor: pointer;
   border: 0;
   background-color: transparent;
@@ -1473,7 +1482,6 @@ div.states > select {
   appearance: none;
 }
 
-div.states > .cultureBase,
 div.states > .burgName,
 div.states > .burgState,
 div.states > .burgCulture {
@@ -1510,19 +1518,23 @@ div.states > .riverType {
   width: 5em;
 }
 
-div.states > .coaIcon {
+.coaIcon {
   stroke-width: 3;
   width: 1.4em;
   height: 1.4em;
   margin: -0.3em 0;
-  cursor: pointer;
 }
 
-div.states > .coaIcon > use {
+.coaIcon > use {
   pointer-events: none;
 }
 
 #diplomacyBodySection > div {
+  cursor: pointer;
+}
+
+.changeRelations > * {
+  pointer-events: none;
   cursor: pointer;
 }
 
@@ -1605,28 +1617,6 @@ div.states > .coaIcon > use {
   color: #abaaaa;
 }
 
-div.states > .religionName {
-  width: 11em;
-}
-
-div.states > .religionType {
-  width: 5em;
-  cursor: pointer;
-  border: 0;
-  background-color: transparent;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-}
-
-div.states > .religionForm {
-  width: 6em;
-}
-
-div.states > .religionDeity {
-  width: 15em;
-}
-
 .placeholder {
   opacity: 0;
   cursor: default;
@@ -1661,16 +1651,6 @@ div.states > input.biomeName {
 
 div.states > div.biomeArea {
   width: 5em;
-}
-
-rect.fillRect {
-  stroke: #666666;
-  stroke-width: 2;
-}
-
-#militaryHeader > div,
-#regimentsHeader > div {
-  width: 5.2em;
 }
 
 #militaryBody div.states > input {
@@ -1991,12 +1971,9 @@ input[type="checkbox"] {
 }
 
 div.textual select,
-div.textual textarea {
-  font-family: Copperplate, monospace;
-}
-
+div.textual textarea,
 div.textual input {
-  font-family: Copperplate, monospace;
+  font-family: monospace;
 }
 
 div.textual fieldset {
@@ -2006,12 +1983,12 @@ div.textual fieldset {
 
 div.textual span,
 .textual legend {
-  font-size: 0.8em;
+  font-size: 0.9em;
   font-weight: bold;
 }
 
 #namesbaseExamples {
-  font-family: Copperplate, monospace;
+  font-family: monospace;
   cursor: pointer;
 }
 
@@ -2031,7 +2008,7 @@ div.textual span,
   fill: none;
 }
 
-div#notes {
+#notes {
   display: none;
   position: fixed;
   width: 28vw;
@@ -2041,20 +2018,45 @@ div#notes {
   border: 1px solid #5e4fa2;
   background: rgba(255, 250, 228, 0.7);
   box-shadow: 2px 2px 5px -3px #3a2804;
-  white-space: pre-line;
 }
 
-div#notesHeader {
+@media screen and (max-width: 600px) {
+  #notes {
+    width: 50vw;
+  }
+}
+
+#notesHeader {
   font-weight: bold;
   font-size: 1.3em;
-  padding: 0 0 4px 14px;
+  padding: 16px 0 4px 12px;
   border-bottom: 1px solid #5e4fa2;
 }
 
-div#notesBody {
-  padding: 0 1em;
+#notesBody {
+  padding: 14px 12px;
   max-height: 80vh;
   overflow: auto;
+}
+
+#notesBody > iframe {
+  pointer-events: none;
+  user-select: none;
+}
+
+#notesBody p {
+  margin: 4px;
+}
+
+#notesLegend {
+  height: 87%;
+  outline: 0;
+  overflow-y: auto;
+  padding: 0.6em;
+  font-family: monospace;
+  background-color: #fff;
+  border: 1px solid #dedede;
+  color: #000;
 }
 
 svg.button {
@@ -2080,6 +2082,7 @@ svg.button {
 #reliefIconsDiv {
   margin-top: 2px;
   padding: 2px;
+  width: 100%;
 }
 
 #reliefIconsDiv svg {
@@ -2125,8 +2128,9 @@ svg.button {
   text-decoration: underline;
 }
 
-#info-line {
+.info-line {
   font-size: 0.9em;
+  font-style: italic;
   color: gray;
   user-select: none;
 }
@@ -2239,9 +2243,11 @@ svg.button {
   user-select: none;
 }
 
+
 .dontAsk {
-  display: inline-block;
   margin: 0.9em 0 0 0.6em;
+  display: inline-flex;
+  align-items: center;
 }
 
 #errorBox {
@@ -2270,10 +2276,10 @@ svg.button {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  max-width: 22em;
-  background-color: #fff;
+  max-width: 23em;
   padding: 1.2em;
-  border: solid 1px #000;
+  background-color: var(--bg-dialogs);
+  border: solid 1px var(--dark-solid);
   font-size: 1.2em;
   z-index: 1000;
 }
@@ -2286,11 +2292,8 @@ svg.button {
 
 #mapOverlay {
   position: absolute;
+  inset: 0;
   display: flex;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   align-items: center;
   justify-content: center;
   z-index: 10;
@@ -2304,51 +2307,12 @@ svg.button {
 
 .epgrid line {
   stroke: lightgrey;
-  stroke-opacity: 0.7;
+  stroke-opacity: 0.5;
   shape-rendering: crispEdges;
 }
 
 .epgrid path {
   stroke-width: 0;
-}
-
-.pell {
-  border: 1px solid hsla(0, 0%, 4%, 0.1);
-}
-
-.pell,
-.pell-content {
-  box-sizing: border-box;
-}
-
-.pell-content {
-  height: 14em;
-  outline: 0;
-  overflow-y: auto;
-  padding: 0.6em;
-  font-family: Copperplate, monospace;
-  background-color: #fff;
-  border: 1px solid #dedede;
-}
-
-.pell-actionbar {
-  background-color: #fff;
-  border: 1px solid #dedede;
-  border-bottom: 0;
-}
-
-.pell-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  height: 30px;
-  outline: 0;
-  width: 30px;
-  vertical-align: bottom;
-}
-
-.pell-button-selected {
-  background-color: #f0f0f0;
 }
 
 #debug {
@@ -2364,17 +2328,6 @@ svg.button {
 }
 
 @media only screen and (max-width: 420px) {
-  #collapsible,
-  #options {
-    margin: 0;
-    border: 0;
-  }
-
-  #options {
-    height: 100vh;
-    width: 100vw;
-  }
-
   table {
     width: 100%;
   }
@@ -2386,4 +2339,10 @@ svg.button {
   .drag-trigger {
     display: none;
   }
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background: #25252a;
+    }
 }

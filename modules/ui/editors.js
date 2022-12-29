@@ -2,16 +2,11 @@
 "use strict";
 
 modules.editors = true;
-restoreDefaultEvents(); // apply default viewbox events on load
 
 // restore default viewbox events
 function restoreDefaultEvents() {
   svg.call(zoom);
-  viewbox
-    .style("cursor", "default")
-    .on(".drag", null)
-    .on("click", clicked)
-    .on("touchmove mousemove", moved);
+  viewbox.style("cursor", "default").on(".drag", null).on("click", clicked).on("touchmove mousemove", onMouseMove);
   legend.call(d3.drag().on("start", dragLegendBox));
 }
 
@@ -28,11 +23,7 @@ function clicked() {
   if (grand.id === "emblems") editEmblem();
   else if (parent.id === "rivers") editRiver(el.id);
   else if (grand.id === "routes") editRoute();
-  else if (
-    el.tagName === "tspan" &&
-    grand.parentNode.parentNode.id === "labels"
-  )
-    editLabel();
+  else if (el.tagName === "tspan" && grand.parentNode.parentNode.id === "labels") editLabel();
   else if (grand.id === "burgLabels") editBurg();
   else if (grand.id === "burgIcons") editBurg();
   else if (parent.id === "ice") editIce();
@@ -41,7 +32,7 @@ function clicked() {
   else if (grand.id === "coastline") editCoastline();
   else if (great.id === "armies") editRegiment();
   else if (pack.cells.t[i] === 1) {
-    const node = document.getElementById("island_" + pack.cells.f[i]);
+    const node = byId("island_" + pack.cells.f[i]);
     editCoastline(node);
   } else if (grand.id === "lakes") editLake();
 }
@@ -58,19 +49,21 @@ function unselect() {
 
 // close all dialogs except stated
 function closeDialogs(except = "#except") {
-  $(".dialog:visible")
-    .not(except)
-    .each(function () {
-      $(this).dialog("close");
-    });
+  try {
+    $(".dialog:visible")
+      .not(except)
+      .each(function () {
+        $(this).dialog("close");
+      });
+  } catch (error) {}
 }
 
 // move brush radius circle
 function moveCircle(x, y, r = 20) {
-  let circle = document.getElementById("brushCircle");
+  let circle = byId("brushCircle");
   if (!circle) {
-    const html = `<circle id="brushCircle" cx=${x} cy=${y} r=${r}></circle>`;
-    document.getElementById("debug").insertAdjacentHTML("afterBegin", html);
+    const html = /* html */ `<circle id="brushCircle" cx=${x} cy=${y} r=${r}></circle>`;
+    byId("debug").insertAdjacentHTML("afterBegin", html);
   } else {
     circle.setAttribute("cx", x);
     circle.setAttribute("cy", y);
@@ -79,8 +72,7 @@ function moveCircle(x, y, r = 20) {
 }
 
 function removeCircle() {
-  if (document.getElementById("brushCircle"))
-    document.getElementById("brushCircle").remove();
+  if (byId("brushCircle")) byId("brushCircle").remove();
 }
 
 // get browser-defined fit-content
@@ -89,24 +81,35 @@ function fitContent() {
 }
 
 // apply sorting behaviour for lines on Editor header click
-document.querySelectorAll(".sortable").forEach(function (e) {
-  e.addEventListener("click", function (e) {
+document.querySelectorAll(".sortable").forEach(function (event) {
+  event.on("click", function () {
     sortLines(this);
   });
 });
 
-function sortLines(header) {
-  const type = header.classList.contains("alphabetically") ? "name" : "number";
-  let order = header.className.includes("-down") ? "-up" : "-down";
-  if (!header.className.includes("icon-sort") && type === "name") order = "-up";
+function applySortingByHeader(headerContainer) {
+  document
+    .getElementById(headerContainer)
+    .querySelectorAll(".sortable")
+    .forEach(function (element) {
+      element.on("click", function () {
+        sortLines(this);
+      });
+    });
+}
 
-  const headers = header.parentNode;
-  headers.querySelectorAll("div.sortable").forEach((e) => {
-    e.classList.forEach((c) => {
+function sortLines(headerElement) {
+  const type = headerElement.classList.contains("alphabetically") ? "name" : "number";
+  let order = headerElement.className.includes("-down") ? "-up" : "-down";
+  if (!headerElement.className.includes("icon-sort") && type === "name") order = "-up";
+
+  const headers = headerElement.parentNode;
+  headers.querySelectorAll("div.sortable").forEach(e => {
+    e.classList.forEach(c => {
       if (c.includes("icon-sort")) e.classList.remove(c);
     });
   });
-  header.classList.add("icon-sort-" + type + order);
+  headerElement.classList.add("icon-sort-" + type + order);
   applySorting(headers);
 }
 
@@ -125,7 +128,7 @@ function applySorting(headers) {
       const bn = name ? b.dataset[sortby] : +b.dataset[sortby];
       return (an > bn ? 1 : an < bn ? -1 : 0) * desc;
     })
-    .forEach((line) => list.appendChild(line));
+    .forEach(line => list.appendChild(line));
 }
 
 function addBurg(point) {
@@ -140,10 +143,7 @@ function addBurg(point) {
   const feature = cells.f[cell];
 
   const temple = pack.states[state].form === "Theocracy";
-  const population = Math.max(
-    (cells.s[cell] + cells.road[cell]) / 3 + i / 1000 + (cell % 100) / 1000,
-    0.1
-  );
+  const population = Math.max((cells.s[cell] + cells.road[cell]) / 3 + i / 1000 + (cell % 100) / 1000, 0.1);
   const type = BurgsAndStates.getType(cell, false);
 
   // generate emblem
@@ -151,22 +151,7 @@ function addBurg(point) {
   coa.shield = COA.getShield(culture, state);
   COArenderer.add("burg", i, coa, x, y);
 
-  pack.burgs.push({
-    name,
-    cell,
-    x,
-    y,
-    state,
-    i,
-    culture,
-    feature,
-    capital: 0,
-    port: 0,
-    temple,
-    population,
-    coa,
-    type,
-  });
+  pack.burgs.push({name, cell, x, y, state, i, culture, feature, capital: 0, port: 0, temple, population, coa, type});
   cells.burg[cell] = i;
 
   const townSize = burgIcons.select("#towns").attr("size") || 0.5;
@@ -197,7 +182,7 @@ function moveBurgToGroup(id, g) {
   const icon = document.querySelector("#burgIcons [data-id='" + id + "']");
   const anchor = document.querySelector("#anchors [data-id='" + id + "']");
   if (!label || !icon) {
-    ERROR && console.error("Cannot find label or icon elements");
+    ERROR && console.error(`Cannot find label or icon elements for id ${id}`);
     return;
   }
 
@@ -218,6 +203,25 @@ function moveBurgToGroup(id, g) {
   }
 }
 
+function moveAllBurgsToGroup(fromGroup, toGroup) {
+  const groupToMove = document.querySelector(`#burgIcons #${fromGroup}`);
+  const burgsToMove = Array.from(groupToMove.children).map(x => x.dataset.id);
+  addBurgsGroup(toGroup);
+  burgsToMove.forEach(x => moveBurgToGroup(x, toGroup));
+}
+
+function addBurgsGroup(group) {
+  if (document.querySelector(`#burgLabels > #${group}`)) return;
+  const labelCopy = document.querySelector("#burgLabels > #towns").cloneNode(false);
+  const iconCopy = document.querySelector("#burgIcons > #towns").cloneNode(false);
+  const anchorCopy = document.querySelector("#anchors > #towns").cloneNode(false);
+
+  // FIXME: using the same id is against the spec!
+  document.querySelector("#burgLabels").appendChild(labelCopy).id = group;
+  document.querySelector("#burgIcons").appendChild(iconCopy).id = group;
+  document.querySelector("#anchors").appendChild(anchorCopy).id = group;
+}
+
 function removeBurg(id) {
   const label = document.querySelector("#burgLabels [data-id='" + id + "']");
   const icon = document.querySelector("#burgIcons [data-id='" + id + "']");
@@ -233,7 +237,7 @@ function removeBurg(id) {
 
   if (burg.coa) {
     const coaId = "burgCOA" + id;
-    if (document.getElementById(coaId)) document.getElementById(coaId).remove();
+    if (byId(coaId)) byId(coaId).remove();
     emblems.select(`#burgEmblems > use[data-i='${id}']`).remove();
     delete burg.coa; // remove to save data
   }
@@ -246,11 +250,7 @@ function toggleCapital(burg) {
     return;
   }
   if (pack.burgs[burg].capital) {
-    tip(
-      "To change capital please assign a capital status to another burg of this state",
-      false,
-      "error"
-    );
+    tip("To change capital please assign a capital status to another burg of this state", false, "error");
     return;
   }
   const old = pack.states[state].capital;
@@ -275,12 +275,7 @@ function togglePort(burg) {
 
   const haven = pack.cells.haven[b.cell];
   const port = haven ? pack.cells.f[haven] : -1;
-  if (!haven)
-    tip(
-      "Port haven is not found, system won't be able to make a searoute",
-      false,
-      "warn"
-    );
+  if (!haven) tip("Port haven is not found, system won't be able to make a searoute", false, "warn");
   b.port = port;
 
   const g = b.capital ? "cities" : "towns";
@@ -301,41 +296,64 @@ function getBurgSeed(burg) {
 }
 
 function getMFCGlink(burg) {
+  if (burg.link) return burg.link;
+
   const {cells} = pack;
-  const {name, population, cell} = burg;
-  const burgSeed = getBurgSeed(burg);
-  const sizeRaw = 2.13 * Math.pow((population * populationRate) / urbanDensity, 0.385);
+  const {i, name, population: burgPopulation, cell} = burg;
+  const seed = getBurgSeed(burg);
+
+  const sizeRaw = 2.13 * Math.pow((burgPopulation * populationRate) / urbanDensity, 0.385);
   const size = minmax(Math.ceil(sizeRaw), 6, 100);
-  const people = rn(population * populationRate * urbanization);
+  const population = rn(burgPopulation * populationRate * urbanization);
+
+  const river = cells.r[cell] ? 1 : 0;
+  const coast = Number(burg.port > 0);
+  const sea = coast && cells.haven[cell] ? getSeaDirections(cell) : null;
+
+  const biome = cells.biome[cell];
+  const arableBiomes = river ? [1, 2, 3, 4, 5, 6, 7, 8] : [5, 6, 7, 8];
+  const farms = +arableBiomes.includes(biome);
+
+  const citadel = +burg.citadel;
+  const urban_castle = +(citadel && each(2)(i));
 
   const hub = +cells.road[cell] > 50;
-  const river = cells.r[cell] ? 1 : 0;
 
-  const coast = +burg.port;
-  const citadel = +burg.citadel;
   const walls = +burg.walls;
   const plaza = +burg.plaza;
   const temple = +burg.temple;
-  const shanty = +burg.shanty;
+  const shantytown = +burg.shanty;
 
-  const sea = coast && cells.haven[cell] ? getSeaDirections(cell) : "";
   function getSeaDirections(i) {
     const p1 = cells.p[i];
     const p2 = cells.p[cells.haven[i]];
     let deg = (Math.atan2(p2[1] - p1[1], p2[0] - p1[0]) * 180) / Math.PI - 90;
     if (deg < 0) deg += 360;
-    const norm = rn(normalize(deg, 0, 360) * 2, 2); // 0 = south, 0.5 = west, 1 = north, 1.5 = east
-    return "&sea=" + norm;
+    return rn(normalize(deg, 0, 360) * 2, 2); // 0 = south, 0.5 = west, 1 = north, 1.5 = east
   }
 
-  const baseURL = "https://watabou.github.io/city-generator/?random=0&continuous=0";
-  const url = `${baseURL}&name=${name}&population=${people}&size=${size}&seed=${burgSeed}&hub=${hub}&river=${river}&coast=${coast}&citadel=${citadel}&plaza=${plaza}&temple=${temple}&walls=${walls}&shantytown=${shanty}${sea}`;
-  return url;
-}
+  const parameters = {
+    name,
+    population,
+    size,
+    seed,
+    river,
+    coast,
+    farms,
+    citadel,
+    urban_castle,
+    hub,
+    plaza,
+    temple,
+    walls,
+    shantytown,
+    gates: -1
+  };
+  const url = new URL("https://watabou.github.io/city-generator/");
+  url.search = new URLSearchParams(parameters);
+  if (sea) url.searchParams.append("sea", sea);
 
-function toggleBurgLock(burg) {
-  const b = pack.burgs[burg];
-  b.lock = b.lock ? 0 : 1;
+  return url.toString();
 }
 
 // draw legend box
@@ -354,22 +372,13 @@ function drawLegend(name, data) {
   const vOffset = fontSize / 2;
 
   // append items
-  const boxes = legend
-    .append("g")
-    .attr("stroke-width", 0.5)
-    .attr("stroke", "#111111")
-    .attr("stroke-dasharray", "none");
-  const labels = legend
-    .append("g")
-    .attr("fill", "#000000")
-    .attr("stroke", "none");
+  const boxes = legend.append("g").attr("stroke-width", 0.5).attr("stroke", "#111111").attr("stroke-dasharray", "none");
+  const labels = legend.append("g").attr("fill", "#000000").attr("stroke", "none");
 
   const columns = Math.ceil(data.length / itemsInCol);
   for (let column = 0, i = 0; column < columns; column++) {
     const linesInColumn = Math.ceil(data.length / columns);
-    const offset = column
-      ? colOffset * 2 + legend.node().getBBox().width
-      : colOffset;
+    const offset = column ? colOffset * 2 + legend.node().getBBox().width : colOffset;
 
     for (let l = 0; l < linesInColumn && data[i]; l++, i++) {
       boxes
@@ -436,7 +445,7 @@ function redrawLegend() {
   const data = legend
     .attr("data")
     .split("|")
-    .map((l) => l.split(","));
+    .map(l => l.split(","));
   drawLegend(name, data);
 }
 
@@ -463,15 +472,15 @@ function clearLegend() {
 function createPicker() {
   const pos = () => tip("Drag to change the picker position");
   const cl = () => tip("Click to close the picker");
-  const closePicker = () => contaiter.style("display", "none");
+  const closePicker = () => container.style("display", "none");
 
-  const contaiter = d3
+  const container = d3
     .select("body")
     .append("svg")
     .attr("id", "pickerContainer")
     .attr("width", "100%")
     .attr("height", "100%");
-  contaiter
+  container
     .append("rect")
     .attr("x", 0)
     .attr("y", 0)
@@ -480,7 +489,7 @@ function createPicker() {
     .attr("opacity", 0.2)
     .on("mousemove", cl)
     .on("click", closePicker);
-  const picker = contaiter
+  const picker = container
     .append("g")
     .attr("id", "picker")
     .call(
@@ -494,39 +503,19 @@ function createPicker() {
   const h = controls.append("g");
   h.append("text").attr("x", 4).attr("y", 14).text("H:");
   h.append("line").attr("x1", 18).attr("y1", 10).attr("x2", 107).attr("y2", 10);
-  h.append("circle")
-    .attr("cx", 75)
-    .attr("cy", 10)
-    .attr("r", 5)
-    .attr("id", "pickerH");
+  h.append("circle").attr("cx", 75).attr("cy", 10).attr("r", 5).attr("id", "pickerH");
   h.on("mousemove", () => tip("Set palette hue"));
 
   const s = controls.append("g");
   s.append("text").attr("x", 113).attr("y", 14).text("S:");
-  s.append("line")
-    .attr("x1", 124)
-    .attr("y1", 10)
-    .attr("x2", 206)
-    .attr("y2", 10);
-  s.append("circle")
-    .attr("cx", 181.4)
-    .attr("cy", 10)
-    .attr("r", 5)
-    .attr("id", "pickerS");
+  s.append("line").attr("x1", 124).attr("y1", 10).attr("x2", 206).attr("y2", 10);
+  s.append("circle").attr("cx", 181.4).attr("cy", 10).attr("r", 5).attr("id", "pickerS");
   s.on("mousemove", () => tip("Set palette saturation"));
 
   const l = controls.append("g");
   l.append("text").attr("x", 213).attr("y", 14).text("L:");
-  l.append("line")
-    .attr("x1", 226)
-    .attr("y1", 10)
-    .attr("x2", 306)
-    .attr("y2", 10);
-  l.append("circle")
-    .attr("cx", 282)
-    .attr("cy", 10)
-    .attr("r", 5)
-    .attr("id", "pickerL");
+  l.append("line").attr("x1", 226).attr("y1", 10).attr("x2", 306).attr("y2", 10);
+  l.append("circle").attr("cx", 282).attr("cy", 10).attr("r", 5).attr("id", "pickerL");
   l.on("mousemove", () => tip("Set palette lightness"));
 
   controls.selectAll("line").on("click", clickPickerControl);
@@ -539,46 +528,35 @@ function createPicker() {
     .attr("y", 20)
     .attr("width", 303)
     .attr("height", 20)
-    .on("mousemove", () =>
-      tip("Color value in different color spaces. Edit to change")
-    );
-  const html = `
-  <label style="margin-right: 6px">HSL: 
-    <input type="number" id="pickerHSL_H" data-space="hsl" min=0 max=360 value="231">,
-    <input type="number" id="pickerHSL_S" data-space="hsl" min=0 max=100 value="70">, 
-    <input type="number" id="pickerHSL_L" data-space="hsl" min=0 max=100 value="70">
-  </label>
-  <label style="margin-right: 6px">RGB: 
-    <input type="number" id="pickerRGB_R" data-space="rgb" min=0 max=255 value="125">,
-    <input type="number" id="pickerRGB_G" data-space="rgb" min=0 max=255 value="142">, 
-    <input type="number" id="pickerRGB_B" data-space="rgb" min=0 max=255 value="232">
-  </label>
-  <label>HEX: <input type="text" id="pickerHEX" data-space="hex" style="width:42px" autocorrect="off" spellcheck="false" value="#7d8ee8"></label>`;
+    .on("mousemove", () => tip("Color value in different color spaces. Edit to change"));
+  const html = /* html */ ` <label style="margin-right: 6px"
+      >HSL: <input type="number" id="pickerHSL_H" data-space="hsl" min="0" max="360" value="231" />,
+      <input type="number" id="pickerHSL_S" data-space="hsl" min="0" max="100" value="70" />,
+      <input type="number" id="pickerHSL_L" data-space="hsl" min="0" max="100" value="70" />
+    </label>
+    <label style="margin-right: 6px"
+      >RGB: <input type="number" id="pickerRGB_R" data-space="rgb" min="0" max="255" value="125" />,
+      <input type="number" id="pickerRGB_G" data-space="rgb" min="0" max="255" value="142" />,
+      <input type="number" id="pickerRGB_B" data-space="rgb" min="0" max="255" value="232" />
+    </label>
+    <label>HEX: <input type="text" id="pickerHEX" data-space="hex" style="width:42px" autocorrect="off" spellcheck="false" value="#7d8ee8" /></label>`;
   spaces.node().insertAdjacentHTML("beforeend", html);
   spaces.selectAll("input").on("change", changePickerSpace);
 
-  const colors = picker
-    .append("g")
-    .attr("id", "pickerColors")
-    .attr("stroke", "#333333");
-  const hatches = picker
-    .append("g")
-    .attr("id", "pickerHatches")
-    .attr("stroke", "#333333");
-  const hatching = d3.selectAll("g#hatching > pattern");
+  const colors = picker.append("g").attr("id", "pickerColors").attr("stroke", "#333333");
+  const hatches = picker.append("g").attr("id", "pickerHatches").attr("stroke", "#333333");
+  const hatching = d3.selectAll("g#defs-hatching > pattern");
   const number = hatching.size();
 
-  const clr = d3
-    .range(number)
-    .map((i) => d3.hsl((i / number) * 360, 0.7, 0.7).hex());
+  const clr = d3.range(number).map(i => d3.hsl((i / number) * 360, 0.7, 0.7).hex());
   clr.forEach(function (d, i) {
     colors
       .append("rect")
       .attr("id", "picker_" + d)
       .attr("fill", d)
       .attr("class", i ? "" : "selected")
-      .attr("x", i * 22 + 4)
-      .attr("y", 40)
+      .attr("x", (i % 14) * 22 + 4)
+      .attr("y", 40 + Math.floor(i / 14) * 20)
       .attr("width", 16)
       .attr("height", 16);
   });
@@ -588,8 +566,8 @@ function createPicker() {
       .append("rect")
       .attr("id", "picker_" + this.id)
       .attr("fill", "url(#" + this.id + ")")
-      .attr("x", i * 22 + 4)
-      .attr("y", 61)
+      .attr("x", (i % 14) * 22 + 4)
+      .attr("y", Math.floor(i / 14) * 20 + 20 + number * 2)
       .attr("width", 16)
       .attr("height", 16);
   });
@@ -597,11 +575,13 @@ function createPicker() {
   colors
     .selectAll("rect")
     .on("click", pickerFillClicked)
-    .on("mousemove", () => tip("Click to fill with the color"));
+    .on("mouseover", () => tip("Click to fill with the color"));
   hatches
     .selectAll("rect")
     .on("click", pickerFillClicked)
-    .on("mousemove", () => tip("Click to fill with the hatching"));
+    .on("mouseover", function () {
+      tip("Click to fill with the hatching " + this.id);
+    });
 
   // append box
   const bbox = picker.node().getBBox();
@@ -619,13 +599,13 @@ function createPicker() {
     .on("mousemove", pos);
   picker
     .insert("text", ":first-child")
-    .attr("x", 291)
+    .attr("x", width - 20)
     .attr("y", -10)
     .attr("id", "pickerCloseText")
     .text("✕");
   picker
     .insert("rect", ":first-child")
-    .attr("x", 288)
+    .attr("x", width - 23)
     .attr("y", -21)
     .attr("id", "pickerCloseRect")
     .attr("width", 14)
@@ -647,17 +627,11 @@ function createPicker() {
     .attr("height", 30)
     .attr("id", "pickerHeader")
     .on("mousemove", pos);
-  picker.attr(
-    "transform",
-    `translate(${(svgWidth - width) / 2},${(svgHeight - height) / 2})`
-  );
+  picker.attr("transform", `translate(${(svgWidth - width) / 2},${(svgHeight - height) / 2})`);
 }
 
 function updateSelectedRect(fill) {
-  document
-    .getElementById("picker")
-    .querySelector("rect.selected")
-    .classList.remove("selected");
+  byId("picker").querySelector("rect.selected").classList.remove("selected");
   document
     .getElementById("picker")
     .querySelector("rect[fill='" + fill.toLowerCase() + "']")
@@ -715,9 +689,7 @@ function openPicker(fill, callback) {
   updateSelectedRect(fill);
 
   openPicker.updateFill = function () {
-    const selected = document
-      .getElementById("picker")
-      .querySelector("rect.selected");
+    const selected = byId("picker").querySelector("rect.selected");
     if (!selected) return;
     callback(selected.getAttribute("fill"));
   };
@@ -792,9 +764,7 @@ function changePickerSpace() {
   }
 
   const space = this.dataset.space;
-  const i = Array.from(this.parentNode.querySelectorAll("input")).map(
-    (input) => input.value
-  ); // inputs
+  const i = Array.from(this.parentNode.querySelectorAll("input")).map(input => input.value); // inputs
   const fill =
     space === "hex"
       ? d3.rgb(this.value)
@@ -830,18 +800,9 @@ function fog(id, path) {
       .transition(fadeIn)
       .attr("opacity", 1);
   } else {
-    defs
-      .select("#fog")
-      .append("path")
-      .attr("d", path)
-      .attr("id", id)
-      .attr("opacity", 1);
+    defs.select("#fog").append("path").attr("d", path).attr("id", id).attr("opacity", 1);
     const opacity = fogging.attr("opacity");
-    fogging
-      .style("display", "block")
-      .attr("opacity", 0)
-      .transition(fadeIn)
-      .attr("opacity", opacity);
+    fogging.style("display", "block").attr("opacity", 0).transition(fadeIn).attr("opacity", opacity);
   }
 }
 
@@ -855,23 +816,14 @@ function unfog(id) {
 }
 
 function getFileName(dataType) {
-  const formatTime = (time) => (time < 10 ? "0" + time : time);
+  const formatTime = time => (time < 10 ? "0" + time : time);
   const name = mapName.value;
-  const type = dataType ? dataType + " " : "";
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = formatTime(date.getMonth() + 1);
-  const day = formatTime(date.getDate());
-  const hour = formatTime(date.getHours());
-  const minutes = formatTime(date.getMinutes());
-  const dateString = [year, month, day, hour, minutes].join("-");
-  //return name + " " + type + dateString;
 
-  return name;
+  return name ;
 }
 
 function downloadFile(data, name, type = "text/plain") {
-  const dataBlob = new Blob([data], { type });
+  const dataBlob = new Blob([data], {type});
   const url = window.URL.createObjectURL(dataBlob);
   const link = document.createElement("a");
   link.download = name;
@@ -884,7 +836,7 @@ function uploadFile(el, callback) {
   const fileReader = new FileReader();
   fileReader.readAsText(el.files[0], "UTF-8");
   el.value = "";
-  fileReader.onload = (loaded) => callback(loaded.target.result);
+  fileReader.onload = loaded => callback(loaded.target.result);
 }
 
 function getBBox(element) {
@@ -892,7 +844,7 @@ function getBBox(element) {
   const y = +element.getAttribute("y");
   const width = +element.getAttribute("width");
   const height = +element.getAttribute("height");
-  return { x, y, width, height };
+  return {x, y, width, height};
 }
 
 function highlightElement(element, zoom) {
@@ -931,8 +883,8 @@ function selectIcon(initial, callback) {
   if (!callback) return;
   $("#iconSelector").dialog();
 
-  const table = document.getElementById("iconTable");
-  const input = document.getElementById("iconInput");
+  const table = byId("iconTable");
+  const input = byId("iconInput");
   input.value = initial;
 
   if (!table.innerHTML) {
@@ -1123,7 +1075,7 @@ function selectIcon(initial, callback) {
       "🍻",
       "🍺",
       "🍲",
-      "🍷",
+      "🍷"
     ];
 
     let row = "";
@@ -1134,16 +1086,15 @@ function selectIcon(initial, callback) {
     }
   }
 
-  input.oninput = (e) => callback(input.value);
-  table.onclick = (e) => {
+  input.oninput = e => callback(input.value);
+  table.onclick = e => {
     if (e.target.tagName === "TD") {
       input.value = e.target.innerHTML;
       callback(input.value);
     }
   };
-  table.onmouseover = (e) => {
-    if (e.target.tagName === "TD")
-      tip(`Click to select ${e.target.innerHTML} icon`);
+  table.onmouseover = e => {
+    if (e.target.tagName === "TD") tip(`Click to select ${e.target.innerHTML} icon`);
   };
 
   $("#iconSelector").dialog({
@@ -1157,9 +1108,18 @@ function selectIcon(initial, callback) {
       Close: function () {
         callback(initial);
         $(this).dialog("close");
-      },
-    },
+      }
+    }
   });
+}
+
+function getAreaUnit(squareMark = "²") {
+  return byId("areaUnit").value === "square" ? byId("distanceUnitInput").value + squareMark : byId("areaUnit").value;
+}
+
+function getArea(rawArea) {
+  const distanceScale = byId("distanceScaleInput")?.value;
+  return rawArea * distanceScale ** 2;
 }
 
 function confirmationDialog(options) {
@@ -1169,7 +1129,7 @@ function confirmationDialog(options) {
     cancel = "Cancel",
     confirm = "Continue",
     onCancel,
-    onConfirm,
+    onConfirm
   } = options;
 
   const buttons = {
@@ -1180,35 +1140,47 @@ function confirmationDialog(options) {
     [cancel]: function () {
       if (onCancel) onCancel();
       $(this).dialog("close");
-    },
+    }
   };
 
-  document.getElementById("alertMessage").innerHTML = message;
-  $("#alert").dialog({ resizable: false, title, buttons });
+  byId("alertMessage").innerHTML = message;
+  $("#alert").dialog({resizable: false, title, buttons});
 }
 
 // add and register event listeners to clean up on editor closure
 function listen(element, event, handler) {
-  element.addEventListener(event, handler);
-  return () => element.removeEventListener(event, handler);
+  element.on(event, handler);
+  return () => element.off(event, handler);
 }
 
 // Calls the refresh functionality on all editors currently open.
 function refreshAllEditors() {
   TIME && console.time("refreshAllEditors");
-  if (document.getElementById("culturesEditorRefresh").offsetParent)
-    culturesEditorRefresh.click();
-  if (document.getElementById("biomesEditorRefresh").offsetParent)
-    biomesEditorRefresh.click();
-  if (document.getElementById("diplomacyEditorRefresh").offsetParent)
-    diplomacyEditorRefresh.click();
-  if (document.getElementById("provincesEditorRefresh").offsetParent)
-    provincesEditorRefresh.click();
-  if (document.getElementById("religionsEditorRefresh").offsetParent)
-    religionsEditorRefresh.click();
-  if (document.getElementById("statesEditorRefresh").offsetParent)
-    statesEditorRefresh.click();
-  if (document.getElementById("zonesEditorRefresh").offsetParent)
-    zonesEditorRefresh.click();
+  if (byId("culturesEditorRefresh")?.offsetParent) culturesEditorRefresh.click();
+  if (byId("biomesEditorRefresh")?.offsetParent) biomesEditorRefresh.click();
+  if (byId("diplomacyEditorRefresh")?.offsetParent) diplomacyEditorRefresh.click();
+  if (byId("provincesEditorRefresh")?.offsetParent) provincesEditorRefresh.click();
+  if (byId("religionsEditorRefresh")?.offsetParent) religionsEditorRefresh.click();
+  if (byId("statesEditorRefresh")?.offsetParent) statesEditorRefresh.click();
+  if (byId("zonesEditorRefresh")?.offsetParent) zonesEditorRefresh.click();
   TIME && console.timeEnd("refreshAllEditors");
+}
+
+// dynamically loaded editors
+async function editStates() {
+  if (customization) return;
+  const Editor = await import("../dynamic/editors/states-editor.js?v=12062022");
+  Editor.open();
+}
+
+async function editCultures() {
+  if (customization) return;
+  const Editor = await import("../dynamic/editors/cultures-editor.js?v=1.87.06");
+  Editor.open();
+}
+
+async function editReligions() {
+  if (customization) return;
+  const Editor = await import("../dynamic/editors/religions-editor.js?v=1.87.01");
+  Editor.open();
 }

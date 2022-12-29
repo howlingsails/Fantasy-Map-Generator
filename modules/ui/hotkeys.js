@@ -4,6 +4,8 @@ document.addEventListener("keydown", handleKeydown);
 document.addEventListener("keyup", handleKeyup);
 
 function handleKeydown(event) {
+  if (!allowHotkeys()) return; // in some cases (e.g. in a textarea) hotkeys are not allowed
+
   const {code, ctrlKey, altKey} = event;
   if (altKey && !ctrlKey) event.preventDefault(); // disallow alt key combinations
   if (ctrlKey && ["KeyS", "KeyC"].includes(code)) event.preventDefault(); // disallow CTRL + S and CTRL + C
@@ -12,11 +14,8 @@ function handleKeydown(event) {
 
 function handleKeyup(event) {
   if (!modules.editors) return; // if editors are not loaded, do nothing
+  if (!allowHotkeys()) return; // in some cases (e.g. in a textarea) hotkeys are not allowed
 
-  const {tagName, contentEditable} = document.activeElement;
-  if (["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) return; // don't trigger if user inputs text
-  if (tagName === "DIV" && contentEditable === "true") return; // don't trigger if user inputs a text
-  if (document.getSelection().toString()) return; // don't trigger if user selects text
   event.stopPropagation();
 
   const {code, key, ctrlKey, metaKey, shiftKey, altKey} = event;
@@ -25,7 +24,7 @@ function handleKeyup(event) {
   const alt = altKey || key === "Alt";
 
   if (code === "F1") showInfo();
-  else if (code === "F2") regeneratePrompt("hotkey");
+  else if (code === "F2") regeneratePrompt();
   else if (code === "F6") quickSave();
   else if (code === "F9") quickLoad();
   else if (code === "Tab") toggleOptions(event);
@@ -35,8 +34,8 @@ function handleKeyup(event) {
   else if (ctrl && code === "KeyQ") toggleSaveReminder();
   else if (ctrl && code === "KeyS") downloadMap();
   else if (ctrl && code === "KeyC") saveToDropbox();
-  else if (ctrl && code === "KeyZ" && undo.offsetParent) undo.click();
-  else if (ctrl && code === "KeyY" && redo.offsetParent) redo.click();
+  else if (ctrl && code === "KeyZ" && undo?.offsetParent) undo.click();
+  else if (ctrl && code === "KeyY" && redo?.offsetParent) redo.click();
   else if (shift && code === "KeyH") editHeightmap();
   else if (shift && code === "KeyB") editBiomes();
   else if (shift && code === "KeyS") editStates();
@@ -49,6 +48,7 @@ function handleKeyup(event) {
   else if (shift && code === "KeyY") openEmblemEditor();
   else if (shift && code === "KeyQ") editUnits();
   else if (shift && code === "KeyO") editNotes();
+  else if (shift && code === "KeyA") overviewCharts();
   else if (shift && code === "KeyT") overviewBurgs();
   else if (shift && code === "KeyV") overviewRivers();
   else if (shift && code === "KeyM") overviewMilitary();
@@ -89,13 +89,13 @@ function handleKeyup(event) {
   else if (code === "KeyI") toggleIcons();
   else if (code === "KeyM") toggleMilitary();
   else if (code === "KeyK") toggleMarkers();
-  else if (code === "Equal") toggleRulers();
+  else if (code === "Equal" && !customization) toggleRulers();
   else if (code === "Slash") toggleScaleBar();
   else if (code === "ArrowLeft") zoom.translateBy(svg, 10, 0);
   else if (code === "ArrowRight") zoom.translateBy(svg, -10, 0);
   else if (code === "ArrowUp") zoom.translateBy(svg, 0, 10);
   else if (code === "ArrowDown") zoom.translateBy(svg, 0, -10);
-  else if (key === "+" || key === "-") pressNumpadSign(key);
+  else if (key === "+" || key === "-" || key === "=") handleSizeChange(key);
   else if (key === "0") resetZoom(1000);
   else if (key === "1") zoom.scaleTo(svg, 1);
   else if (key === "2") zoom.scaleTo(svg, 2);
@@ -109,19 +109,34 @@ function handleKeyup(event) {
   else if (ctrl) toggleMode();
 }
 
-function pressNumpadSign(key) {
-  const change = key === "+" ? 1 : -1;
+function allowHotkeys() {
+  const {tagName, contentEditable} = document.activeElement;
+  if (["INPUT", "SELECT", "TEXTAREA"].includes(tagName)) return false;
+  if (tagName === "DIV" && contentEditable === "true") return false;
+  if (document.getSelection().toString()) return false;
+  return true;
+}
+
+// "+", "-" and "=" keys on numpad. "=" is for "+" on Mac
+function handleSizeChange(key) {
   let brush = null;
 
-  if (brushRadius.offsetParent) brush = document.getElementById("brushRadius");
-  else if (biomesManuallyBrush.offsetParent) brush = document.getElementById("biomesManuallyBrush");
-  else if (statesManuallyBrush.offsetParent) brush = document.getElementById("statesManuallyBrush");
-  else if (provincesManuallyBrush.offsetParent) brush = document.getElementById("provincesManuallyBrush");
-  else if (culturesManuallyBrush.offsetParent) brush = document.getElementById("culturesManuallyBrush");
-  else if (zonesBrush.offsetParent) brush = document.getElementById("zonesBrush");
-  else if (religionsManuallyBrush.offsetParent) brush = document.getElementById("religionsManuallyBrush");
+  if (document.getElementById("brushRadius")?.offsetParent) brush = document.getElementById("brushRadius");
+  else if (document.getElementById("linePower")?.offsetParent) brush = document.getElementById("linePower");
+  else if (document.getElementById("biomesManuallyBrush")?.offsetParent)
+    brush = document.getElementById("biomesManuallyBrush");
+  else if (document.getElementById("statesManuallyBrush")?.offsetParent)
+    brush = document.getElementById("statesManuallyBrush");
+  else if (document.getElementById("provincesManuallyBrush")?.offsetParent)
+    brush = document.getElementById("provincesManuallyBrush");
+  else if (document.getElementById("culturesManuallyBrush")?.offsetParent)
+    brush = document.getElementById("culturesManuallyBrush");
+  else if (document.getElementById("zonesBrush")?.offsetParent) brush = document.getElementById("zonesBrush");
+  else if (document.getElementById("religionsManuallyBrush")?.offsetParent)
+    brush = document.getElementById("religionsManuallyBrush");
 
   if (brush) {
+    const change = key === "-" ? -5 : 5;
     const value = minmax(+brush.value + change, +brush.min, +brush.max);
     brush.value = document.getElementById(brush.id + "Number").value = value;
     return;
@@ -132,19 +147,27 @@ function pressNumpadSign(key) {
 }
 
 function toggleMode() {
-  if (zonesRemove.offsetParent) {
-    zonesRemove.classList.contains("pressed") ? zonesRemove.classList.remove("pressed") : zonesRemove.classList.add("pressed");
+  if (zonesRemove?.offsetParent) {
+    zonesRemove.classList.contains("pressed")
+      ? zonesRemove.classList.remove("pressed")
+      : zonesRemove.classList.add("pressed");
   }
 }
 
 function removeElementOnKey() {
-  const fastDelete = Array.from(document.querySelectorAll("[role='dialog'] .fastDelete")).find(dialog => dialog.style.display !== "none");
+  const fastDelete = Array.from(document.querySelectorAll("[role='dialog'] .fastDelete")).find(
+    dialog => dialog.style.display !== "none"
+  );
   if (fastDelete) fastDelete.click();
 
-  const visibleDialogs = Array.from(document.querySelectorAll("[role='dialog']")).filter(dialog => dialog.style.display !== "none");
+  const visibleDialogs = Array.from(document.querySelectorAll("[role='dialog']")).filter(
+    dialog => dialog.style.display !== "none"
+  );
   if (!visibleDialogs.length) return;
 
-  visibleDialogs.forEach(dialog => dialog.querySelectorAll("button").forEach(button => button.textContent === "Remove" && button.click()));
+  visibleDialogs.forEach(dialog =>
+    dialog.querySelectorAll("button").forEach(button => button.textContent === "Remove" && button.click())
+  );
 }
 
 function closeAllDialogs() {

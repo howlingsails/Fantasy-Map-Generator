@@ -2,10 +2,7 @@
 // module to control the Tools options (click to edit, to re-geenerate, tp add)
 
 toolsContent.addEventListener("click", function (event) {
-  if (customization) {
-    tip("Please exit the customization mode first", false, "warning");
-    return;
-  }
+  if (customization) return tip("Please exit the customization mode first", false, "warning");
   if (!["BUTTON", "I"].includes(event.target.tagName)) return;
   const button = event.target.id;
 
@@ -22,6 +19,7 @@ toolsContent.addEventListener("click", function (event) {
   else if (button === "editUnitsButton") editUnits();
   else if (button === "editNotesButton") editNotes();
   else if (button === "editZonesButton") editZones();
+  else if (button === "overviewChartsButton") overviewCharts();
   else if (button === "overviewBurgsButton") overviewBurgs();
   else if (button === "overviewRiversButton") overviewRivers();
   else if (button === "overviewMilitaryButton") overviewMilitary();
@@ -30,12 +28,10 @@ toolsContent.addEventListener("click", function (event) {
 
   // click on Regenerate buttons
   if (event.target.parentNode.id === "regenerateFeature") {
-    if (sessionStorage.getItem("regenerateFeatureDontAsk")) {
-      processFeatureRegeneration(event, button);
-      return;
-    }
+    const dontAsk = sessionStorage.getItem("regenerateFeatureDontAsk");
+    if (dontAsk) return processFeatureRegeneration(event, button);
 
-    alertMessage.innerHTML = `Regeneration will remove all the custom changes for the element.<br><br>Are you sure you want to proceed?`;
+    alertMessage.innerHTML = /* html */ `Regeneration will remove all the custom changes for the element.<br /><br />Are you sure you want to proceed?`;
     $("#alert").dialog({
       resizable: false,
       title: "Regenerate element",
@@ -49,15 +45,14 @@ toolsContent.addEventListener("click", function (event) {
         }
       },
       open: function () {
-        const pane = $(this).dialog("widget").find(".ui-dialog-buttonpane");
-        $(
-          '<span><input id="dontAsk" class="checkbox" type="checkbox"><label for="dontAsk" class="checkbox-label dontAsk"><i>do not ask again</i></label><span>'
-        ).prependTo(pane);
+        const checkbox =
+          '<span><input id="dontAsk" class="checkbox" type="checkbox"><label for="dontAsk" class="checkbox-label dontAsk"><i>do not ask again</i></label><span>';
+        const pane = this.parentElement.querySelector(".ui-dialog-buttonpane");
+        pane.insertAdjacentHTML("afterbegin", checkbox);
       },
       close: function () {
-        const box = $(this).dialog("widget").find(".checkbox")[0];
-        if (!box) return;
-        if (box.checked) sessionStorage.setItem("regenerateFeatureDontAsk", true);
+        const box = this.parentElement.querySelector(".checkbox");
+        if (box?.checked) sessionStorage.setItem("regenerateFeatureDontAsk", true);
         $(this).dialog("destroy");
       }
     });
@@ -72,6 +67,9 @@ toolsContent.addEventListener("click", function (event) {
   else if (button === "addRiver") toggleAddRiver();
   else if (button === "addRoute") toggleAddRoute();
   else if (button === "addMarker") toggleAddMarker();
+  // click to create a new map buttons
+  else if (button === "openSubmapMenu") UISubmap.openSubmapMenu();
+  else if (button === "openResampleMenu") UISubmap.openResampleMenu();
 });
 
 function processFeatureRegeneration(event, button) {
@@ -140,13 +138,14 @@ function recalculatePopulation() {
 }
 
 function regenerateStates() {
-  const localSeed = Math.floor(Math.random() * 1e9); // new random seed
+  const localSeed = generateSeed();
   Math.random = aleaPRNG(localSeed);
 
-  const statesCount = +regionsInput.value;
+  const statesCount = +regionsOutput.value;
   const burgs = pack.burgs.filter(b => b.i && !b.removed);
   if (!burgs.length) return tip("There are no any burgs to generate states. Please create burgs first", false, "error");
-  if (burgs.length < statesCount) tip(`Not enough burgs to generate ${statesCount} states. Will generate only ${burgs.length} states`, false, "warn");
+  if (burgs.length < statesCount)
+    tip(`Not enough burgs to generate ${statesCount} states. Will generate only ${burgs.length} states`, false, "warn");
 
   // turn all old capitals into towns
   burgs
@@ -208,10 +207,15 @@ function regenerateStates() {
     }
 
     const culture = capital.culture;
-    const basename = capital.name.length < 9 && capital.cell % 5 === 0 ? capital.name : Names.getCulture(culture, 3, 6, "", 0);
+    const basename =
+      capital.name.length < 9 && capital.cell % 5 === 0 ? capital.name : Names.getCulture(culture, 3, 6, "", 0);
     const name = Names.getState(basename, culture);
     const nomadic = [1, 2, 3, 4].includes(pack.cells.biome[capital.cell]);
-    const type = nomadic ? "Nomadic" : pack.cultures[culture].type === "Nomadic" ? "Generic" : pack.cultures[culture].type;
+    const type = nomadic
+      ? "Nomadic"
+      : pack.cultures[culture].type === "Nomadic"
+      ? "Generic"
+      : pack.cultures[culture].type;
     const expansionism = rn(Math.random() * powerInput.value + 1, 1);
 
     const cultureType = pack.cultures[culture].type;
@@ -237,9 +241,9 @@ function regenerateStates() {
   Military.generate();
   if (layerIsOn("toggleEmblems")) drawEmblems(); // redrawEmblems
 
-  if (document.getElementById("burgsOverviewRefresh").offsetParent) burgsOverviewRefresh.click();
-  if (document.getElementById("statesEditorRefresh").offsetParent) statesEditorRefresh.click();
-  if (document.getElementById("militaryOverviewRefresh").offsetParent) militaryOverviewRefresh.click();
+  if (document.getElementById("burgsOverviewRefresh")?.offsetParent) burgsOverviewRefresh.click();
+  if (document.getElementById("statesEditorRefresh")?.offsetParent) statesEditorRefresh.click();
+  if (document.getElementById("militaryOverviewRefresh")?.offsetParent) militaryOverviewRefresh.click();
 }
 
 function regenerateProvinces() {
@@ -256,57 +260,59 @@ function regenerateProvinces() {
 }
 
 function regenerateBurgs() {
-  const cells = pack.cells,
-    states = pack.states,
-    Lockedburgs = pack.burgs.filter(b => b.lock);
+  const {cells, states} = pack;
+  const lockedburgs = pack.burgs.filter(b => b.lock);
   rankCells();
+
   cells.burg = new Uint16Array(cells.i.length);
   const burgs = (pack.burgs = [0]); // clear burgs array
   states.filter(s => s.i).forEach(s => (s.capital = 0)); // clear state capitals
   pack.provinces.filter(p => p.i).forEach(p => (p.burg = 0)); // clear province capitals
   const burgsTree = d3.quadtree();
 
+  // add locked burgs
+  for (let j = 0; j < lockedburgs.length; j++) {
+    const id = burgs.length;
+    const lockedBurg = lockedburgs[j];
+    lockedBurg.i = id;
+    burgs.push(lockedBurg);
+
+    burgsTree.add([lockedBurg.x, lockedBurg.y]);
+    cells.burg[lockedBurg.cell] = id;
+
+    if (lockedBurg.capital) {
+      const stateId = lockedBurg.state;
+      states[stateId].capital = id;
+      states[stateId].center = lockedBurg.cell;
+    }
+  }
+
   const score = new Int16Array(cells.s.map(s => s * Math.random())); // cell score for capitals placement
   const sorted = cells.i.filter(i => score[i] > 0 && cells.culture[i]).sort((a, b) => score[b] - score[a]); // filtered and sorted array of indexes
   const burgsCount =
-    manorsInput.value == 1000 ? rn(sorted.length / 5 / (grid.points.length / 10000) ** 0.8) + states.length : +manorsInput.value + states.length;
+    manorsInput.value === "1000"
+      ? rn(sorted.length / 5 / (grid.points.length / 10000) ** 0.8) + states.length
+      : +manorsInput.value + states.length;
   const spacing = (graphWidth + graphHeight) / 150 / (burgsCount ** 0.7 / 66); // base min distance between towns
-
-  //clear locked list since ids will change
-  //burglock.selectAll("text").remove();
-  for (let j = 0; j < Lockedburgs.length; j++) {
-    const id = burgs.length;
-    const oldBurg = Lockedburgs[j];
-    oldBurg.i = id;
-    burgs.push(oldBurg);
-    burgsTree.add([oldBurg.x, oldBurg.y]);
-    cells.burg[oldBurg.cell] = id;
-    if (oldBurg.capital) {
-      states[oldBurg.state].capital = id;
-      states[oldBurg.state].center = oldBurg.cell;
-    }
-    //burglock.append("text").attr("data-id", id);
-  }
 
   for (let i = 0; i < sorted.length && burgs.length < burgsCount; i++) {
     const id = burgs.length;
     const cell = sorted[i];
-    const x = cells.p[cell][0],
-      y = cells.p[cell][1];
+    const [x, y] = cells.p[cell];
 
     const s = spacing * gauss(1, 0.3, 0.2, 2, 2); // randomize to make the placement not uniform
     if (burgsTree.find(x, y, s) !== undefined) continue; // to close to existing burg
 
-    const state = cells.state[cell];
-    const capital = state && !states[state].capital; // if state doesn't have capital, make this burg a capital, no capital for neutral lands
+    const stateId = cells.state[cell];
+    const capital = stateId && !states[stateId].capital; // if state doesn't have capital, make this burg a capital, no capital for neutral lands
     if (capital) {
-      states[state].capital = id;
-      states[state].center = cell;
+      states[stateId].capital = id;
+      states[stateId].center = cell;
     }
 
     const culture = cells.culture[cell];
     const name = Names.getCulture(culture);
-    burgs.push({cell, x, y, state, i: id, culture, name, capital, feature: cells.f[cell]});
+    burgs.push({cell, x, y, state: stateId, i: id, culture, name, capital, feature: cells.f[cell]});
     burgsTree.add([x, y]);
     cells.burg[cell] = id;
   }
@@ -324,8 +330,9 @@ function regenerateBurgs() {
     });
 
   pack.features.forEach(f => {
-    if (f.port) f.port = 0;
-  }); // reset features ports counter
+    if (f.port) f.port = 0; // reset features ports counter
+  });
+
   BurgsAndStates.specifyBurgs();
   BurgsAndStates.defineBurgFeatures();
   BurgsAndStates.drawBurgs();
@@ -336,8 +343,8 @@ function regenerateBurgs() {
   emblems.selectAll("use").remove();
   if (layerIsOn("toggleEmblems")) drawEmblems();
 
-  if (document.getElementById("burgsOverviewRefresh").offsetParent) burgsOverviewRefresh.click();
-  if (document.getElementById("statesEditorRefresh").offsetParent) statesEditorRefresh.click();
+  if (document.getElementById("burgsOverviewRefresh")?.offsetParent) burgsOverviewRefresh.click();
+  if (document.getElementById("statesEditorRefresh")?.offsetParent) statesEditorRefresh.click();
 }
 
 function regenerateEmblems() {
@@ -428,7 +435,10 @@ function regenerateMarkers() {
 }
 
 function regenerateZones(event) {
-  if (isCtrlClick(event)) prompt("Please provide zones number multiplier", {default: 1, step: 0.01, min: 0, max: 100}, v => addNumberOfZones(v));
+  if (isCtrlClick(event))
+    prompt("Please provide zones number multiplier", {default: 1, step: 0.01, min: 0, max: 100}, v =>
+      addNumberOfZones(v)
+    );
   else addNumberOfZones(gauss(1, 0.5, 0.6, 5, 2));
 
   function addNumberOfZones(number) {
@@ -545,7 +555,18 @@ function addRiverOnClick() {
   if (cells.h[i] < 20) return tip("Cannot create river in water cell", false, "error");
   if (cells.b[i]) return;
 
-  const {alterHeights, resolveDepressions, addMeandering, getRiverPath, getBasin, getName, getType, getWidth, getOffset, getApproximateLength} = Rivers;
+  const {
+    alterHeights,
+    resolveDepressions,
+    addMeandering,
+    getRiverPath,
+    getBasin,
+    getName,
+    getType,
+    getWidth,
+    getOffset,
+    getApproximateLength
+  } = Rivers;
   const riverCells = [];
   let riverId = rivers.length ? last(rivers).i + 1 : 1;
   let parent = riverId;
@@ -624,7 +645,10 @@ function addRiverOnClick() {
 
   const source = riverCells[0];
   const mouth = riverCells[riverCells.length - 2];
-  const widthFactor = river?.widthFactor || (!parent || parent === riverId ? 1.2 : 1);
+
+  const defaultWidthFactor = rn(1 / (pointsInput.dataset.cells / 10000) ** 0.25, 2);
+  const widthFactor =
+    river?.widthFactor || (!parent || parent === riverId ? defaultWidthFactor * 1.2 : defaultWidthFactor);
   const meanderedPoints = addMeandering(riverCells);
 
   const discharge = cells.fl[mouth]; // m3 in second
@@ -642,7 +666,21 @@ function addRiverOnClick() {
     const name = getName(mouth);
     const type = getType({i: riverId, length, parent});
 
-    rivers.push({i: riverId, source, mouth, discharge, length, width, widthFactor, sourceWidth: 0, parent, cells: riverCells, basin, name, type});
+    rivers.push({
+      i: riverId,
+      source,
+      mouth,
+      discharge,
+      length,
+      width,
+      widthFactor,
+      sourceWidth: 0,
+      parent,
+      cells: riverCells,
+      basin,
+      name,
+      type
+    });
   }
 
   // render river
@@ -679,7 +717,12 @@ function addRouteOnClick() {
   unpressClickToAddButton();
   const point = d3.mouse(this);
   const id = getNextId("route");
-  elSelected = routes.select("g").append("path").attr("id", id).attr("data-new", 1).attr("d", `M${point[0]},${point[1]}`);
+  elSelected = routes
+    .select("g")
+    .append("path")
+    .attr("id", id)
+    .attr("data-new", 1)
+    .attr("d", `M${point[0]},${point[1]}`);
   editRoute(true);
 }
 
@@ -704,14 +747,16 @@ function addMarkerOnClick() {
   const point = d3.mouse(this);
   const x = rn(point[0], 2);
   const y = rn(point[1], 2);
-  const i = markers.length ? last(markers).i + 1 : 0;
 
+  // Find the current cell
+  const cell = findCell(point[0], point[1]);
+
+  // Find the currently selected marker to use as a base
   const isMarkerSelected = markers.length && elSelected?.node()?.parentElement?.id === "markers";
   const selectedMarker = isMarkerSelected ? markers.find(marker => marker.i === +elSelected.attr("id").slice(6)) : null;
   const baseMarker = selectedMarker || {icon: "❓"};
-  const marker = {...baseMarker, i, x, y};
+  const marker = Markers.add({...baseMarker, x, y, cell});
 
-  markers.push(marker);
   const markersElement = document.getElementById("markers");
   const rescale = +markersElement.getAttribute("rescale");
   markersElement.insertAdjacentHTML("beforeend", drawMarker(marker, rescale));
@@ -739,7 +784,7 @@ function configMarkersGeneration() {
       const inputId = `markerIconInput${index}`;
       return `<tr>
         <td><input value="${type}" /></td>
-        <td>
+        <td style="position: relative">
           <input id="${inputId}" style="width: 5em" value="${icon}" />
           <i class="icon-edit pointer" style="position: absolute; margin:.4em 0 0 -1.4em; font-size:.85em"></i>
         </td>
@@ -810,4 +855,9 @@ function viewCellDetails() {
     title: "Cell Details",
     position: {my: "right top", at: "right-10 top+10", of: "svg", collision: "fit"}
   });
+}
+
+async function overviewCharts() {
+  const Overview = await import("../dynamic/overview/charts-overview.js?v=1.87.03");
+  Overview.open();
 }
