@@ -410,10 +410,20 @@ function editBurg(id) {
 
     function updateMFCGFrame(burg) {
         const mfcgURL = getMFCGlink(burg);
-        document.getElementById("mfcgPreview").setAttribute("src", mfcgURL + "&preview=1");
+    const burgGeneratorURL = getBurgLink(burg);
+    document.getElementById("mfcgPreview").setAttribute("src", mfcgURL);
         document.getElementById("mfcgLink").setAttribute("href", mfcgURL);
+        document
+            .getElementById("burgGenerator")
+            .setAttribute("href", burgGeneratorURL);
     }
-
+    function getBurgLink(burg) {
+        const worldName = mapName.value;
+        //const baseURL = "https://howlingsails.com/world_vision/world/";
+        const baseURL = "http://localhost:9090/world_vision/world/";
+        const url = `${baseURL}${worldName}/burg/${burg.i}`;
+        return url;
+    }
     function changeSeed() {
         const id = +elSelected.attr("data-id");
         const burg = pack.burgs[id];

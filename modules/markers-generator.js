@@ -394,10 +394,10 @@ window.Markers = (function () {
         return cells.i.filter(i => !occupied[i] && cells.h[i] > 50 && !cells.burg[i]);
     }
 
+    // ** Gem Mines are the power of magic
     function addGemMines(id, cell) {
         const {cells} = pack;
-
-        const resources = {
+        const resources_linked_world_vision = {
             "Agni mani": 1,
             "Alamandine": 1,
             "Alestone": 1,
@@ -558,8 +558,7 @@ window.Markers = (function () {
             "Ziose": 1,
             "Zircon": 1
         };
-
-        const resource = rw(resources);
+        const resource = rw(resources_linked_world_vision);
         const burg = pack.burgs[cells.burg[cell]];
         const name = `${burg.name} — ${resource} mining town`;
         const population = rn(burg.population * populationRate * urbanization);
