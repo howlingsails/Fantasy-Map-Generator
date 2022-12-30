@@ -153,15 +153,15 @@ function editReliefIcon() {
         const z = y + h * 2;
         const s = rn(h * 2, 2);
 
-        let nth = 1;
-        while (positions[nth] && z > positions[nth]) {
-          nth++;
+        let reliefNth = 1;
+        while (positions[reliefNth] && z > positions[reliefNth]) {
+          reliefNth++;
         }
 
         tree.add([cx, cy]);
         positions.push(z);
         terrain
-          .insert("use", ":nth-child(" + nth + ")")
+          .insert("use", ":nth-child(" + reliefNth + ")")
           .attr("href", type)
           .attr("x", x)
           .attr("y", y)
