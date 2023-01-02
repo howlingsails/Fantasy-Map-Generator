@@ -108,7 +108,7 @@
       }
     </style>
 
-    <link rel="preload" href="index.css?v=1.88.00" as="style" onload="this.onload=null; this.rel='stylesheet'" />
+    <link rel="preload" href="index.css?v=1.88.03" as="style" onload="this.onload=null; this.rel='stylesheet'" />
     <link rel="preload" href="icons.css" as="style" onload="this.onload=null; this.rel='stylesheet'" />
     <link rel="preload" href="libs/jquery-ui.css" as="style" onload="this.onload=null; this.rel='stylesheet'" />
   </head>
@@ -4060,9 +4060,10 @@
             onclick="wiki('Heightmap-template-editor')"
           ></button>
           <label
-            data-tip="Set seed if you want template to generate the same heightmap each time. Leave blank to use random seed"
+            data-tip="Lock seed (click on lock icon) if you want template to generate the same heightmap each time"
           >
-            Seed: <input id="templateSeed" value="" type="number" min="1" max="999999999" step="1" style="width: 7em" />
+            Seed: <input id="templateSeed" value="" type="number" min="1" max="999999999" step="1" style="width: 8em" />
+            <i data-locked="0" id="lock_templateSeed" class="icon-lock-open"></i>
           </label>
         </div>
       </div>
@@ -7829,7 +7830,7 @@
     <script src="utils/commonUtils.js"></script>
     <script src="utils/arrayUtils.js"></script>
     <script src="utils/colorUtils.js"></script>
-    <script src="utils/graphUtils.js"></script>
+    <script src="utils/graphUtils.js?v=1.88.02"></script>
     <script src="utils/nodeUtils.js"></script>
     <script src="utils/numberUtils.js"></script>
     <script src="utils/polyfills.js"></script>
@@ -7853,7 +7854,7 @@
     <script src="modules/military-generator.js"></script>
     <script src="modules/markers-generator.js?v=1.87.13"></script>
     <script src="modules/coa-generator.js"></script>
-    <script src="modules/submap.js"></script>
+    <script src="modules/submap.js?v=1.88.05"></script>
     <script src="libs/polylabel.min.js"></script>
     <script src="libs/lineclip.min.js"></script>
     <script src="libs/alea.min.js"></script>
@@ -7862,16 +7863,16 @@
     <script src="modules/ui/measurers.js?v=1.87.02"></script>
     <script src="modules/ui/stylePresets.js"></script>
 
-    <script src="modules/ui/general.js?v=1.87.00"></script>
-    <script src="modules/ui/options.js?v=1.87.15"></script>
-    <script src="main.js?v=1.87.15"></script>
+    <script src="modules/ui/general.js?v=1.87.03"></script>
+    <script src="modules/ui/options.js?v=1.88.02"></script>
+    <script src="main.js?v=1.88.02"></script>
 
     <script defer src="modules/relief-icons.js"></script>
     <script defer src="modules/ui/style.js"></script>
-    <script defer src="modules/ui/editors.js?v=1.87.07"></script>
-    <script defer src="modules/ui/tools.js?v=1.87.03"></script>
+    <script defer src="modules/ui/editors.js?v=1.88.06"></script>
+    <script defer src="modules/ui/tools.js?v=1.88.05"></script>
     <script defer src="modules/ui/world-configurator.js"></script>
-    <script defer src="modules/ui/heightmap-editor.js?v=1.88.00"></script>
+    <script defer src="modules/ui/heightmap-editor.js?v=1.88.03"></script>
     <script defer src="modules/ui/provinces-editor.js"></script>
     <script defer src="modules/ui/biomes-editor.js"></script>
     <script defer src="modules/ui/namesbase-editor.js?v=1.87.10"></script>
@@ -7888,7 +7889,7 @@
     <script defer src="modules/ui/burg-editor.js"></script>
     <script defer src="modules/ui/units-editor.js"></script>
     <script defer src="modules/ui/notes-editor.js"></script>
-    <script defer src="modules/ui/diplomacy-editor.js"></script>
+    <script defer src="modules/ui/diplomacy-editor.js?v=1.88.04"></script>
     <script defer src="modules/ui/zones-editor.js"></script>
     <script defer src="modules/ui/burgs-overview.js"></script>
     <script defer src="modules/ui/rivers-overview.js"></script>
@@ -7907,7 +7908,7 @@
     <script defer src="libs/jquery.ui.touch-punch.min.js"></script>
 
     <script defer src="modules/io/save.js"></script>
-    <script defer src="modules/io/load.js?v=1.87.08"></script>
+    <script defer src="modules/io/load.js?v=1.88.05"></script>
     <script defer src="modules/io/cloud.js"></script>
     <script defer src="modules/io/export.js"></script>
     <script defer src="modules/io/formats.js"></script>
