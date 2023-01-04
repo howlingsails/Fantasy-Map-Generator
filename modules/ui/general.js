@@ -100,11 +100,11 @@ function showNotes(e) {
         document.getElementById("notes").style.display = "block";
         let noteId = note.id
         if (noteId.includes("marker")) {
-            let marker_i = note.id.replace("marker","")
+            let marker_i = note.id.replace("marker", "")
 
-            let linkedMakerNameHTML = "<a href=\"" + getMarkerLink(marker_i) +"\" target=\"_blank\">"+
+            let linkedMakerNameHTML = "<a href=\"" + getMarkerLink(marker_i) + "\" target=\"_blank\">" +
                 note.name + "</a>"
-            document.getElementById("notesHeader").innerHTML  = linkedMakerNameHTML;
+            document.getElementById("notesHeader").innerHTML = linkedMakerNameHTML;
         } else {
             document.getElementById("notesHeader").innerHTML = note.name;
         }
