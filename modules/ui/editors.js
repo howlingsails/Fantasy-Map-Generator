@@ -699,7 +699,7 @@ function getFileName(dataType) {
   const hour = formatTime(date.getHours());
   const minutes = formatTime(date.getMinutes());
   const dateString = [year, month, day, hour, minutes].join("-");
-  return name + " " + type + dateString;
+  return name;
 }
 
 function downloadFile(data, name, type = "text/plain") {

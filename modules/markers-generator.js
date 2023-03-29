@@ -31,7 +31,7 @@ window.Markers = (function () {
       {type: "ruines", icon: "🏺", multiplier: 10, fn: addRuines},
       {type: "spiders", icon: "🕷️", multiplier: 25, fn: addHillMonsters},
       {type: "giant goat heard", icon: "🐐", multiplier: 25, fn: addHillMonsters},
-      {type: "citadel", icon: "🏯", multiplier: 25, fn: addSacredPineries},
+      {type: "citadel", icon: "🏯", multiplier: 25, fn: addSacredCitadel},
       {type: "portals", icon: "🌀", multiplier: 4, fn: addPortals}
     ];
   }
@@ -665,6 +665,24 @@ window.Markers = (function () {
       const culture = cells.culture[cell];
       const name = `${Names.getCulture(culture)} Forest`;
       const legend = `A sacred forest of ${cultures[culture].name} culture`;
+      notes.push({id, name, legend});
+      quantity--;
+    }
+  }
+
+  function addSacredCitadel(type, icon, multiplier) {
+    const {cells, cultures} = pack;
+
+    let isolatedHills = Array.from(cells.i.filter(i => !occupied[i] && !cells.culture[i] && cells.h[i] >=60).sort((a, b) => cells.h[b] - cells.h[a]));
+    let quantity = getQuantity(isolatedHills, 30, 1000, multiplier);
+    if (!quantity) return;
+
+    while (quantity) {
+      const [cell] = extractAnyElement(isolatedHills);
+      const id = addMarker({cell, icon, type});
+      const culture = cells.culture[cell];
+      const name = `${Names.getCulture(culture)} Citadel`;
+      const legend = `A sacred Citadel of ${cultures[culture].name} culture`;
       notes.push({id, name, legend});
       quantity--;
     }
