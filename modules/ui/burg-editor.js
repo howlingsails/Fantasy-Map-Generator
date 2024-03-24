@@ -19,12 +19,16 @@ function editBurg(id) {
         resize: function(event, ui) {
             // Adjust the iframe size, leaving some space for dialog content apart from the iframe
             var headerAndPaddingHeight = 284; // Adjust based on your dialog's header and padding
-            $("#mfcgPreview").width(ui.size.width-10).height(ui.size.height - headerAndPaddingHeight);
+            var new_height = Math.max(ui.size.height - headerAndPaddingHeight, 500 )
+
+
+            $("#mfcgPreview").width(ui.size.width-10).height(new_height);
         },
         open: function(event, ui) {
             // Also adjust the iframe size when the dialog is first opened
             var initialWidth = $(this).width()-10;
             var initialHeight = $(this).height() - 284; // Adjust based on your dialog's header and padding
+            initialHeight = Math.max(initialHeight, 500 )
             $("#mfcgPreview").width(initialWidth).height(initialHeight);
         },
         close: closeBurgEditor,
