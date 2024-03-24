@@ -223,14 +223,14 @@ const downloadMap = function () {
     );
 
   downloadMapOrig();
-  downloadMarkers();
-  downloadBurgs();
-  downloadCultures();
-  downloadCells();
-  downloadReligions();
-  downloadPopRates();
-  downloadStates();
-  downloadNotes();
+  //downloadMarkers();
+  //downloadBurgs();
+  //downloadCultures();
+  //downloadCells();
+  //downloadReligions();
+  //downloadPopRates();
+  //downloadStates();
+  //downloadNotes();
   closeDialogs("#alert");
   window.URL.revokeObjectURL(URL);
 }
