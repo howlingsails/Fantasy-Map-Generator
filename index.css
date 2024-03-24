@@ -1,3 +1,9 @@
+#mfcgPreview {
+    width: 80%; /* Ensure it expands to the full width of the dialog */
+    height: 35%; /* Initial height before JavaScript adjustment, adjust as necessary */
+    border: solid 2px #;
+}
+
 input,
 select,
 button {

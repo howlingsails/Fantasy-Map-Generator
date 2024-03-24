@@ -121,6 +121,7 @@
                 transform: rotate(359deg);
             }
         }
+
     </style>
 
     <link rel="preload" href="index.css?v=1.88.00" as="style" onload="this.onload=null; this.rel='stylesheet'"/>
@@ -3281,6 +3282,68 @@
                     </div>
                 </div>
             </div>
+            <div id="burgDetails" style="word-wrap: break-word; max-width: 642px">
+                <hr>
+                <a id="burgGenerator" target="_blank">
+                    Burg Details by Fantasy World Fantasy Visions Generator
+                </a>
+                <p style="word-wrap: break-word; max-width: 95%">Click above to uncover detailed insights into
+                    leadership dynamics, thriving industries, key trade merchants, and the local taverns' vibrant life.
+                    Delve deeper with individual NPC profiles, each crafted to enhance your storytelling and gameplay.
+                    Make your adventure creation process seamless and immersive by integrating this meticulously curated
+                    information into your module. Your journey through this fantasy world begins with just one
+                    click.</p>
+                <hr>
+                <div id="burgBottom">
+                    <button id="burgGroupShow" data-tip="Show group change section" class="icon-tags"></button>
+                    <div id="burgGroupSection" style="display: none">
+                        <button id="burgGroupHide" data-tip="Hide group change section" class="icon-tags"></button>
+                        <select id="burgSelectGroup" data-tip="Select a group for this burg"
+                                style="width: 10em"></select>
+                        <input
+                                id="burgInputGroup"
+                                placeholder="new group name"
+                                data-tip="Create new Group for the Burg"
+                                style="display: none; width: 10em"
+                        />
+                        <i id="burgAddGroup" data-tip="Create new group for the burg" class="icon-plus pointer"></i>
+                        <i id="burgRemoveGroup" data-tip="Remove selected burg group" class="icon-trash pointer"></i>
+                    </div>
+
+                    <button id="burgStyleShow" data-tip="Show style edit section" class="icon-brush"></button>
+                    <div id="burgStyleSection" style="display: none">
+                        <button id="burgStyleHide" data-tip="Hide style edit section" class="icon-brush"></button>
+                        <button
+                                id="burgEditLabelStyle"
+                                data-tip="Edit label style for burg group in Style Editor"
+                                class="icon-font"
+                        ></button>
+                        <button
+                                id="burgEditIconStyle"
+                                data-tip="Edit icon style for burg group in Style Editor"
+                                class="icon-dot-circled"
+                        ></button>
+                        <button
+                                id="burgEditAnchorStyle"
+                                data-tip="Edit port icon (anchor) style for burg group in Style Editor"
+                                class="icon-anchor"
+                        ></button>
+                    </div>
+
+                    <button id="burgEditEmblem" data-tip="Edit emblem" class="icon-shield-alt"></button>
+                    <button id="burgToggleMFCGMap" data-tip="Toggle MFCG map" class="icon-map"></button>
+                    <button id="burgRelocate" data-tip="Relocate burg" class="icon-target"></button>
+                    <button id="burglLegend" data-tip="Edit free text notes (legend) for this burg"
+                            class="icon-edit"></button>
+                    <button id="burgLock" class="icon-lock-open" onmouseover="showElementLockTip(event)"></button>
+                    <button
+                            id="burgRemove"
+                            data-tip="Remove non-capital burg"
+                            data-shortcut="Delete"
+                            class="icon-trash fastDelete"
+                    ></button>
+                </div>
+            </div>
 
             <div
                     id="mfcgPreviewSection"
@@ -3306,60 +3369,6 @@
                     ></i>
                 </div>
                 <iframe id="mfcgPreview" sandbox="allow-scripts allow-same-origin"></iframe>
-            </div>
-        </div>
-        <div id="burgDetails">
-            <a id="burgGenerator" target="_blank">
-                Burg Details by World Fantasy Visions
-            </a>
-            <hr>
-            <div id="burgBottom">
-                <button id="burgGroupShow" data-tip="Show group change section" class="icon-tags"></button>
-                <div id="burgGroupSection" style="display: none">
-                    <button id="burgGroupHide" data-tip="Hide group change section" class="icon-tags"></button>
-                    <select id="burgSelectGroup" data-tip="Select a group for this burg" style="width: 10em"></select>
-                    <input
-                            id="burgInputGroup"
-                            placeholder="new group name"
-                            data-tip="Create new Group for the Burg"
-                            style="display: none; width: 10em"
-                    />
-                    <i id="burgAddGroup" data-tip="Create new group for the burg" class="icon-plus pointer"></i>
-                    <i id="burgRemoveGroup" data-tip="Remove selected burg group" class="icon-trash pointer"></i>
-                </div>
-
-                <button id="burgStyleShow" data-tip="Show style edit section" class="icon-brush"></button>
-                <div id="burgStyleSection" style="display: none">
-                    <button id="burgStyleHide" data-tip="Hide style edit section" class="icon-brush"></button>
-                    <button
-                            id="burgEditLabelStyle"
-                            data-tip="Edit label style for burg group in Style Editor"
-                            class="icon-font"
-                    ></button>
-                    <button
-                            id="burgEditIconStyle"
-                            data-tip="Edit icon style for burg group in Style Editor"
-                            class="icon-dot-circled"
-                    ></button>
-                    <button
-                            id="burgEditAnchorStyle"
-                            data-tip="Edit port icon (anchor) style for burg group in Style Editor"
-                            class="icon-anchor"
-                    ></button>
-                </div>
-
-                <button id="burgEditEmblem" data-tip="Edit emblem" class="icon-shield-alt"></button>
-                <button id="burgToggleMFCGMap" data-tip="Toggle MFCG map" class="icon-map"></button>
-                <button id="burgRelocate" data-tip="Relocate burg" class="icon-target"></button>
-                <button id="burglLegend" data-tip="Edit free text notes (legend) for this burg"
-                        class="icon-edit"></button>
-                <button id="burgLock" class="icon-lock-open" onmouseover="showElementLockTip(event)"></button>
-                <button
-                        id="burgRemove"
-                        data-tip="Remove non-capital burg"
-                        data-shortcut="Delete"
-                        class="icon-trash fastDelete"
-                ></button>
             </div>
         </div>
 

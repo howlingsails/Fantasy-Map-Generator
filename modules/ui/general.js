@@ -217,34 +217,41 @@ function showMapTooltip(point, e, i, g) {
     if (group === "ice") return tip("Click to edit the Ice");
 
     // covering elements
-    if (layerIsOn("togglePrec") && land) tip("Annual Precipitation: " + getFriendlyPrecipitation(i));
-    else if (layerIsOn("togglePopulation")) tip(getPopulationTip(i));
-    else if (layerIsOn("toggleTemp")) tip("Temperature: " + convertTemperature(grid.cells.temp[g]));
-    else if (layerIsOn("toggleBiomes") && pack.cells.biome[i]) {
+    var final_tip = ""
+
+    final_tip += ("Annual Precipitation: " + getFriendlyPrecipitation(i));
+    final_tip += " | " + (getPopulationTip(i));
+    final_tip += " | " + tip("Temperature: " + convertTemperature(grid.cells.temp[g]));
+    if (pack.cells.biome[i]) {
         const biome = pack.cells.biome[i];
-        tip("Biome: " + biomesData.name[biome]);
+        final_tip += " | " + ("Biome: " + biomesData.name[biome]);
         if (biomesEditor?.offsetParent) highlightEditorLine(biomesEditor, biome);
-    } else if (layerIsOn("toggleReligions") && pack.cells.religion[i]) {
+    }
+    if (pack.cells.religion[i]) {
         const religion = pack.cells.religion[i];
         const r = pack.religions[religion];
         const type = r.type === "Cult" || r.type == "Heresy" ? r.type : r.type + " religion";
-        tip(type + ": " + r.name);
-        if (religionsEditor?.offsetParent) highlightEditorLine(religionsEditor, religion);
-    } else if (pack.cells.state[i] && (layerIsOn("toggleProvinces") || layerIsOn("toggleStates"))) {
+        final_tip += " | " + (type + ": " + r.name);
+        if (layerIsOn("toggleReligions") && religionsEditor?.offsetParent) highlightEditorLine(religionsEditor, religion);
+    }
+    if (pack.cells.state[i] ) {
         const state = pack.cells.state[i];
         const stateName = pack.states[state].fullName;
         const province = pack.cells.province[i];
         const prov = province ? pack.provinces[province].fullName + ", " : "";
-        tip(prov + stateName);
+        final_tip += " | " + (prov + stateName);
         if (document.getElementById("statesEditor")?.offsetParent) highlightEditorLine(statesEditor, state);
         if (document.getElementById("diplomacyEditor")?.offsetParent) highlightEditorLine(diplomacyEditor, state);
         if (document.getElementById("militaryOverview")?.offsetParent) highlightEditorLine(militaryOverview, state);
         if (document.getElementById("provincesEditor")?.offsetParent) highlightEditorLine(provincesEditor, province);
-    } else if (layerIsOn("toggleCultures") && pack.cells.culture[i]) {
+    }
+    if (pack.cells.culture[i]) {
         const culture = pack.cells.culture[i];
-        tip("Culture: " + pack.cultures[culture].name);
+        final_tip += " | " + ("Culture: " + pack.cultures[culture].name);
         if (document.getElementById("culturesEditor")?.offsetParent) highlightEditorLine(culturesEditor, culture);
-    } else if (layerIsOn("toggleHeight")) tip("Height: " + getFriendlyHeight(point));
+    }
+    if (final_tip += " | " + ("Height: " + getFriendlyHeight(point)));
+    tip(final_tip);
 }
 
 function highlightEditorLine(editor, id, timeout = 10000) {

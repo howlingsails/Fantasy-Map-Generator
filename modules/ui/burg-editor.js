@@ -13,10 +13,25 @@ function editBurg(id) {
 
     $("#burgEditor").dialog({
         title: "Edit Burg",
-        resizable: false,
+        resizable: true,
+        width: $(window).width() * 0.6, // 60% of the viewport width
+        height: $(window).height() * 0.6, // 60% of the viewport height
+        resize: function(event, ui) {
+            // Adjust the iframe size, leaving some space for dialog content apart from the iframe
+            var headerAndPaddingHeight = 284; // Adjust based on your dialog's header and padding
+            $("#mfcgPreview").width(ui.size.width-10).height(ui.size.height - headerAndPaddingHeight);
+        },
+        open: function(event, ui) {
+            // Also adjust the iframe size when the dialog is first opened
+            var initialWidth = $(this).width()-10;
+            var initialHeight = $(this).height() - 284; // Adjust based on your dialog's header and padding
+            $("#mfcgPreview").width(initialWidth).height(initialHeight);
+        },
         close: closeBurgEditor,
         position: {my: "left top", at: "left+10 top+10", of: "svg", collision: "fit"}
     });
+
+
 
     if (modules.editBurg) return;
     modules.editBurg = true;
