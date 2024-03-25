@@ -165,7 +165,7 @@
     "opacity": 0.6,
     "stroke": "#1f3846",
     "stroke-width": 0.7,
-    "filter": null,
+    "filter": "url(#dropShadow)",
     "auto-filter": 1
   },
   "#lake_island": {
@@ -225,7 +225,7 @@
   "#statesHalo": {
     "opacity": 0.77,
     "data-width": 19.4,
-    "stroke-width": 9.97,
+    "stroke-width": 15.54,
     "filter": "blur(1.56px)"
   },
   "#provs": {
