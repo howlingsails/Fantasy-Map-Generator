@@ -20,7 +20,7 @@
   "#stateBorders": {
     "opacity": 0.8,
     "stroke": "#4c483e",
-    "stroke-width": 1,
+    "stroke-width": 2,
     "stroke-dasharray": 2,
     "stroke-linecap": "square",
     "filter": null
@@ -28,7 +28,7 @@
   "#provinceBorders": {
     "opacity": 0.8,
     "stroke": "#56566d",
-    "stroke-width": 0.2,
+    "stroke-width": 0.5,
     "stroke-dasharray": 1,
     "stroke-linecap": "butt",
     "filter": null
@@ -96,7 +96,7 @@
   },
   "#markers": {
     "opacity": null,
-    "rescale": 1,
+    "rescale": 0,
     "filter": null
   },
   "#prec": {
@@ -108,7 +108,7 @@
   },
   "#population": {
     "opacity": null,
-    "stroke-width": 1.6,
+    "stroke-width": 3,
     "stroke-dasharray": null,
     "stroke-linecap": "butt",
     "filter": null
@@ -289,7 +289,7 @@
     "terracing": 10,
     "skip": 5,
     "relax": 0,
-    "curve": 0,
+    "curve": 1,
     "filter": "url(#turbulence)",
     "mask": "url(#land)"
   },
@@ -317,7 +317,7 @@
     "opacity": 1,
     "fill": "#ffffff",
     "fill-opacity": 0.7,
-    "size": 3,
+    "size": 4,
     "stroke": "#3e3e4b",
     "stroke-width": 0.4,
     "stroke-dasharray": "0.5 0.25",
@@ -335,7 +335,7 @@
     "fill": "#3e3e4b",
     "text-shadow": "white 0px 0px 4px",
     "data-size": 4,
-    "font-size": 4,
+    "font-size": 6,
     "font-family": "IM Fell English"
   },
   "#burgIcons > #towns": {
