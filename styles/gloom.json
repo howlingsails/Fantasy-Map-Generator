@@ -165,7 +165,7 @@
     "opacity": 0.6,
     "stroke": "#1f3846",
     "stroke-width": 0.7,
-    "filter": "url(#dropShadow)",
+    "filter": null,
     "auto-filter": 1
   },
   "#lake_island": {
@@ -225,7 +225,7 @@
   "#statesHalo": {
     "opacity": 0.77,
     "data-width": 19.4,
-    "stroke-width": 15.54,
+    "stroke-width": 9.55,
     "filter": "blur(1.56px)"
   },
   "#provs": {
@@ -290,8 +290,8 @@
   "#terrs": {
     "opacity": 0.71,
     "scheme": "green",
-    "terracing": 7,
-    "skip": 1,
+    "terracing": 4,
+    "skip": 2,
     "relax": 4,
     "curve": 0,
     "filter": "",
@@ -313,8 +313,8 @@
     "opacity": 0.79,
     "fill": "#ffffff",
     "text-shadow": "black 0px 2px 4px",
-    "data-size": 20,
-    "font-size": 20,
+    "data-size": 12,
+    "font-size": 12,
     "font-family": "Orbitron"
   },
   "#burgIcons > #cities": {
@@ -365,8 +365,8 @@
     "stroke": "#000000",
     "stroke-width": 0,
     "text-shadow": "black 0px 3px 4px",
-    "data-size": 22,
-    "font-size": 22,
+    "data-size": 18,
+    "font-size": 18,
     "font-family": "Uncial Antiqua",
     "filter": ""
   },

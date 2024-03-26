@@ -6,7 +6,7 @@
   },
   "#armies": {
     "font-size": 8,
-    "box-size": 4,
+    "box-size": 5,
     "stroke": "#000000",
     "stroke-width": 0.6,
     "fill-opacity": 1,
@@ -225,7 +225,7 @@
   "#statesHalo": {
     "opacity": 0.77,
     "data-width": 19.4,
-    "stroke-width": 15.54,
+    "stroke-width": 19.4,
     "filter": "blur(1.56px)"
   },
   "#provs": {

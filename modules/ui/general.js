@@ -129,6 +129,35 @@ function getMarkerLink(mark_i) {
 function showMapTooltip(point, e, i, g) {
 // covering elements
     var final_tip = ""
+    if (pack.cells.biome[i]) {
+        const biome = pack.cells.biome[i];
+        final_tip += " | " + ("Biome: " + biomesData.name[biome]);
+        if (biomesEditor?.offsetParent) highlightEditorLine(biomesEditor, biome);
+    }
+    if (pack.cells.culture[i]) {
+        const culture = pack.cells.culture[i];
+        final_tip += " | " + ("Culture: " + pack.cultures[culture].name);
+        if (document.getElementById("culturesEditor")?.offsetParent) highlightEditorLine(culturesEditor, culture);
+    }
+    if (pack.cells.religion[i]) {
+        const religion = pack.cells.religion[i];
+        const r = pack.religions[religion];
+        const type = r.type === "Cult" || r.type == "Heresy" ? r.type : r.type + " religion";
+        final_tip += " | " + (type + ": " + r.name);
+        if (layerIsOn("toggleReligions") && religionsEditor?.offsetParent) highlightEditorLine(religionsEditor, religion);
+    }
+    if (pack.cells.state[i] ) {
+        const state = pack.cells.state[i];
+        const stateName = pack.states[state].fullName;
+        const province = pack.cells.province[i];
+        const prov = province ? pack.provinces[province].fullName + ", " : "";
+        final_tip += " | " + (prov + stateName);
+        if (document.getElementById("statesEditor")?.offsetParent) highlightEditorLine(statesEditor, state);
+        if (document.getElementById("diplomacyEditor")?.offsetParent) highlightEditorLine(diplomacyEditor, state);
+        if (document.getElementById("militaryOverview")?.offsetParent) highlightEditorLine(militaryOverview, state);
+        if (document.getElementById("provincesEditor")?.offsetParent) highlightEditorLine(provincesEditor, province);
+    }
+    if (final_tip += " | " + ("Height: " + getFriendlyHeight(point)));
 
     tip(""); // clear tip
     const path = e.composedPath ? e.composedPath() : getComposedPath(e.target); // apply polyfill
@@ -166,9 +195,9 @@ function showMapTooltip(point, e, i, g) {
         if (riversOverview?.offsetParent) highlightEditorLine(riversOverview, river, 5000);
     }
 
-    if (group === "routes") return final_tip += " | " +("Click to edit the Route");
+    if (group === "routes") final_tip += " | " +("Click to edit the Route");
 
-    if (group === "terrain") return final_tip += " | " +("Click to edit the Relief Icon");
+    if (group === "terrain") final_tip += " | " +("Click to edit the Relief Icon");
 
     if (subgroup === "burgLabels" || subgroup === "burgIcons") {
         const burg = +path[path.length - 10].dataset.id;
@@ -178,26 +207,26 @@ function showMapTooltip(point, e, i, g) {
         if (burgsOverview?.offsetParent) highlightEditorLine(burgsOverview, burg, 5000);
 
     }
-    if (group === "labels") return final_tip += " | " +("Click to edit the Label");
+    if (group === "labels")  final_tip += " | " +("Click to edit the Label");
 
-    if (group === "markers") return final_tip += " | " +("Click to edit the Marker and pin the marker note");
+    if (group === "markers") final_tip += " | " +("Click to edit the Marker and pin the marker note");
 
     if (group === "ruler") {
         const tag = e.target.tagName;
         const className = e.target.getAttribute("class");
         if (tag === "circle" && className === "edge")
-            return final_tip += " | " +("Drag to adjust. Hold Ctrl and drag to add a point. Click to remove the point");
+            final_tip += " | " +("Drag to adjust. Hold Ctrl and drag to add a point. Click to remove the point");
         if (tag === "circle" && className === "control")
-            return final_tip += " | " +("Drag to adjust. Hold Shift and drag to keep axial direction. Click to remove the point");
-        if (tag === "circle") final_tip += " | " + tip("Drag to adjust the measurer");
-        if (tag === "polyline") final_tip += " | " + tip("Click on drag to add a control point");
-        if (tag === "path") final_tip += " | " + tip("Drag to move the measurer");
-        if (tag === "text") final_tip += " | " + tip("Drag to move, click to remove the measurer");
+            final_tip += " | " +("Drag to adjust. Hold Shift and drag to keep axial direction. Click to remove the point");
+        if (tag === "circle") final_tip += " | " + ("Drag to adjust the measurer");
+        if (tag === "polyline") final_tip += " | " + ("Click on drag to add a control point");
+        if (tag === "path") final_tip += " | " + ("Drag to move the measurer");
+        if (tag === "text") final_tip += " | " + ("Drag to move, click to remove the measurer");
     }
 
-    if (subgroup === "burgIcons") final_tip += " | " + tip("Click to edit the Burg");
+    if (subgroup === "burgIcons") final_tip += " | " + ("Click to edit the Burg");
 
-    if (subgroup === "burgLabels") final_tip += " | " + tip("Click to edit the Burg");
+    if (subgroup === "burgLabels") final_tip += " | " + ("Click to edit the Burg");
 
     if (group === "lakes" && !land) {
         const lakeId = +e.target.dataset.f;
@@ -205,7 +234,7 @@ function showMapTooltip(point, e, i, g) {
         const fullName = subgroup === "freshwater" ? name : name + " " + subgroup;
         final_tip += " | " +(`${fullName} lake. Click to edit`);
     }
-    if (group === "coastline") return tip("Click to edit the coastline");
+    if (group === "coastline")  final_tip += " | " + ("Click to edit the coastline");
 
     if (group === "zones") {
         const zone = path[path.length - 8];
@@ -217,38 +246,9 @@ function showMapTooltip(point, e, i, g) {
     if (group === "ice") final_tip += " | " + ("Click to edit the Ice");
 
 
-    final_tip += ("Annual Precipitation: " + getFriendlyPrecipitation(i));
+    final_tip += ("| Annual Precipitation: " + getFriendlyPrecipitation(i));
     final_tip += " | " + (getPopulationTip(i));
     final_tip += " | " + tip("Temperature: " + convertTemperature(grid.cells.temp[g]));
-    if (pack.cells.biome[i]) {
-        const biome = pack.cells.biome[i];
-        final_tip += " | " + ("Biome: " + biomesData.name[biome]);
-        if (biomesEditor?.offsetParent) highlightEditorLine(biomesEditor, biome);
-    }
-    if (pack.cells.religion[i]) {
-        const religion = pack.cells.religion[i];
-        const r = pack.religions[religion];
-        const type = r.type === "Cult" || r.type == "Heresy" ? r.type : r.type + " religion";
-        final_tip += " | " + (type + ": " + r.name);
-        if (layerIsOn("toggleReligions") && religionsEditor?.offsetParent) highlightEditorLine(religionsEditor, religion);
-    }
-    if (pack.cells.state[i] ) {
-        const state = pack.cells.state[i];
-        const stateName = pack.states[state].fullName;
-        const province = pack.cells.province[i];
-        const prov = province ? pack.provinces[province].fullName + ", " : "";
-        final_tip += " | " + (prov + stateName);
-        if (document.getElementById("statesEditor")?.offsetParent) highlightEditorLine(statesEditor, state);
-        if (document.getElementById("diplomacyEditor")?.offsetParent) highlightEditorLine(diplomacyEditor, state);
-        if (document.getElementById("militaryOverview")?.offsetParent) highlightEditorLine(militaryOverview, state);
-        if (document.getElementById("provincesEditor")?.offsetParent) highlightEditorLine(provincesEditor, province);
-    }
-    if (pack.cells.culture[i]) {
-        const culture = pack.cells.culture[i];
-        final_tip += " | " + ("Culture: " + pack.cultures[culture].name);
-        if (document.getElementById("culturesEditor")?.offsetParent) highlightEditorLine(culturesEditor, culture);
-    }
-    if (final_tip += " | " + ("Height: " + getFriendlyHeight(point)));
     tip(final_tip);
 }
 
@@ -379,7 +379,7 @@ function getFriendlyPopulation(i) {
 
 function getPopulationTip(i) {
     const [rural, urban] = getCellPopulation(i);
-    return `Cell population: ${si(rural + urban)}; Rural: ${si(rural)}; Urban: ${si(urban)}`;
+    return `Region population: ${si(rural + urban)}; Rural: ${si(rural)}; Urban: ${si(urban)}`;
 }
 
 function highlightEmblemElement(type, el) {

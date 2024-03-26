@@ -1,7 +1,7 @@
 // UI module to control the style presets
 "use strict";
 
-const systemPresets = ["default", "ancient", "gloom", "light", "watercolor", "clean", "atlas", "cyberpunk", "monochrome"];
+const systemPresets = ["default", "ancient", "gloom", "light", "watercolor", "clean", "atlas", "cyberpunk", "monochrome","styleStylized_Realism","styleOldie_maximus","milyutinoscyberpunk","styleTolkienInspired"];
 const customPresetPrefix = "fmgStyle_";
 
 // add style presets to list
@@ -15,6 +15,7 @@ const customPresetPrefix = "fmgStyle_";
 
 async function applyStyleOnLoad() {
   const desiredPreset = localStorage.getItem("presetStyle") || "default";
+  debugger;
   const styleData = await getStylePreset(desiredPreset);
   const [appliedPreset, style] = styleData;
 
