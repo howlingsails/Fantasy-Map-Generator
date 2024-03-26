@@ -15,7 +15,6 @@ const customPresetPrefix = "fmgStyle_";
 
 async function applyStyleOnLoad() {
   const desiredPreset = localStorage.getItem("presetStyle") || "default";
-  debugger;
   const styleData = await getStylePreset(desiredPreset);
   const [appliedPreset, style] = styleData;
 
