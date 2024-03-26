@@ -1,7 +1,8 @@
 // UI module to control the style presets
 "use strict";
 
-const systemPresets = ["default", "ancient", "gloom", "light", "watercolor", "clean", "atlas", "cyberpunk", "monochrome","styleStylized_Realism","styleOldie_maximus","milyutinoscyberpunk","styleTolkienInspired"];
+#const systemPresets = ["default", "ancient", "gloom", "light", "watercolor", "clean", "atlas", "cyberpunk", "monochrome","styleStylized_Realism","styleOldie_maximus","milyutinoscyberpunk","styleTolkienInspired"];
+const systemPresets = ["default", "ancient", "gloom", "light", "watercolor", "clean", "atlas", "cyberpunk", "monochrome","pateia"];
 const customPresetPrefix = "fmgStyle_";
 
 // add style presets to list
